@@ -272,11 +272,13 @@ Completed: 2026-08-05 — Stage 1 verified: (1) `npm install` succeeds with zero
 - [ ] `npm run build` succeeds.
 - [ ] The placeholder renders with Astryx tokens in the fixed dark smoke-test mode (and a temporary light-mode check if the provider supports it), not as unstyled native controls only.
 
-**Status: NOT STARTED**
+**Status: COMPLETED**
 
 **Model Tier: Medium**
 
 **Verification Notes:** Not verified.
+
+Completed: 2026-08-05 — Stage 2 verified: (1) Installed `@astryxdesign/core@0.2.0`, `@astryxdesign/theme-neutral@0.2.0`, `-D @astryxdesign/cli@0.2.0` (zero vulnerabilities; npm allow-scripts blocked their postinstall nudges — verified harmless, they only print an "run astryx init" hint). (2) `npm run astryx -- component Button --dense` prints real docs. (3) `astryx init --features agents` generated `AGENTS.md` + `CLAUDE.md` (both ASTRYX:START blocks present, merged with the Next.js agent block already in AGENTS.md). (4) `astryx doctor` initially 5 passed/1 warning (theme not wired); wired `astryx.theme: "@astryxdesign/theme-neutral"` in package.json per doctor's fix — now 6 passed, 0 warnings, 0 failures. (5) Inspected installed docs for Button, Heading, Text, Card, VStack, Theme, TextInput, Switch, Skeleton, getting-started, theme, migration. CLI bin path in 0.2.0 is `bin/astryx.mjs` (not `clients/cli/bin/` as the plan suggested); the package.json script uses the real path. (6) `globals.css` imports core reset + astryx base + neutral theme CSS (layers reset → astryx-base → astryx-theme, confirmed in shipped CSS; removed the create-next-app universal reset that would have killed component padding). (7) `AppProviders` client component wraps children in `<Theme theme={neutralTheme} mode="dark">` using the SSR-optimized `/built` subpath per installed docs; root layout stays a server component, children-only wrapping. (8) Placeholder page renders real Astryx `Heading`/`Text`/`Card`/`Button` — verified in served HTML: `astryx-button` with atomic StyleX classes giving real padding (`--spacing-2`/`--spacing-3`), filled primary `background-color: var(--color-accent)`, and accent focus-visible outlines; `data-astryx-theme="neutral"` scope applied. (9) Temporary light-mode check: switched provider `mode="light"` → rendered `data-theme="light"`, then reverted to dark (`data-theme="dark"`); no hydration warnings in dev log. (10) `npm run lint`, `npm run typecheck`, `npm run build` all clean; dev server serves `GET / 200`.
 
 ---
 
