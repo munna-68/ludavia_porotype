@@ -1,6 +1,6 @@
 import { HStack } from '@astryxdesign/core/HStack';
 import { BrandLogo } from '@/components/chrome/brand-logo';
-import { ThemeToggle } from '@/components/chrome/theme-toggle';
+import { MenuButton } from '@/components/chrome/menu-button';
 
 export function AppHeader() {
   return (
@@ -13,7 +13,7 @@ export function AppHeader() {
         paddingBlock={3}
       >
         <BrandLogo />
-        <ThemeToggle />
+        <MenuButton />
       </HStack>
     </header>
   );

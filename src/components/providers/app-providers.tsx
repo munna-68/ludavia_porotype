@@ -1,6 +1,8 @@
 'use client';
 
 import { createContext, useContext, useSyncExternalStore } from 'react';
+import Link from 'next/link';
+import { LinkProvider } from '@astryxdesign/core/Link';
 import { Theme } from '@astryxdesign/core/theme';
 import { ludaviaTheme } from '@/lib/ludavia';
 
@@ -27,16 +29,14 @@ function readStoredMode(): ThemeMode {
       return stored;
     }
   } catch {
-    // ignore storage failures
+    // Ignore storage failures and keep the dark presentation default.
   }
   return 'dark';
 }
 
 function subscribe(listener: () => void) {
   listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-  };
+  return () => listeners.delete(listener);
 }
 
 export function useThemeMode() {
@@ -50,16 +50,18 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
     try {
       window.localStorage.setItem(THEME_MODE_STORAGE_KEY, next);
     } catch {
-      // ignore storage failures
+      // Ignore storage failures and keep the current in-memory mode.
     }
     listeners.forEach((listener) => listener());
   };
 
   return (
     <ThemeModeContext.Provider value={{ mode, setMode }}>
-      <Theme theme={ludaviaTheme} mode={mode}>
-        {children}
-      </Theme>
+      <LinkProvider component={Link}>
+        <Theme theme={ludaviaTheme} mode={mode}>
+          {children}
+        </Theme>
+      </LinkProvider>
     </ThemeModeContext.Provider>
   );
 }
