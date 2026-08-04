@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "astryx": {
-    "theme": "@astryxdesign/theme-neutral"
+    "theme": "./src/lib/theme.ts"
   },
   "scripts": {
     "dev": "next dev",

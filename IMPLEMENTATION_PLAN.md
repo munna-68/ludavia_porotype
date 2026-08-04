@@ -322,11 +322,11 @@ Completed: 2026-08-05 — Stage 2 verified: (1) Installed `@astryxdesign/core@0.
 - [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**
+**Status: COMPLETED**
 
 **Model Tier: High**
 
-**Verification Notes:** Not verified.
+**Verification Notes:** Completed: 2026-08-05 — Stage 3 verified: (1) Read the installed `theme`, `tokens`, and `color` docs and inspected the actual `defineTheme`/color-scale API. (2) Added `src/lib/theme.ts` with `name: 'ludavia'`, `extends: neutralTheme`, the exact `#4e1d8e` accent seed, exact accent token in both light/dark slots, contrast-safe white `--color-on-accent`, near-black dark body/surface/card tokens (`#0b0a0d`/`#141217`/`#1b171f`), deliberate light tokens, warm-white dark text, muted secondary text, and quiet borders. (3) `npm run astryx -- theme build ./src/lib/theme.ts` succeeded and generated SSR artifacts `src/lib/ludavia.css`, `ludavia.js`, `ludavia.d.ts`, and `ludavia.variants.d.ts`; generated CSS contains the intended cascade layers and exact semantic values. (4) Wired generated `ludaviaTheme` and `ludavia.css` into the provider/global CSS; package `astryx.theme` now points to the custom theme source. Added a narrow ESLint ignore for Astryx's generated triple-slash declaration reference without editing generated output. (5) Foundation smoke test rendered at 390px and 1280px in dark mode, plus 390px light mode, using temporary Playwright Chromium screenshots outside the project; no horizontal overflow, near-black dark surfaces, readable text/borders, white card surfaces in light mode, exact purple primary CTA, and no large purple background. (6) Provider mode was temporarily switched to light and restored to final `mode="dark"`; server output showed `data-astryx-theme="ludavia"` with both `data-theme="light"` and `data-theme="dark"` during checks. Compiled CSS confirms primary button background uses `var(--color-accent)` and focus rules use the accent token. (7) `npm run astryx -- doctor` reports 6 passed, 0 warnings, 0 failures; final `npm run lint`, `npm run typecheck`, and `npm run build` all pass. No raw reset was added; Astryx component padding/focus styles remain present.`
 
 ---
 

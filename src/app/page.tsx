@@ -11,7 +11,12 @@ export default function Home() {
         <Card padding={4} width="100%">
           <VStack gap={2} align="start">
             <Heading level={1}>LudaVia</Heading>
-            <Text type="body">Prototype scaffold</Text>
+            <Text type="label" color="accent">
+              Brand theme smoke test
+            </Text>
+            <Text type="body">
+              Near-black surfaces, warm text, and one intentional accent.
+            </Text>
             <Button label="Primary action" variant="primary" />
           </VStack>
         </Card>
