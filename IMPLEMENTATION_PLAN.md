@@ -175,11 +175,13 @@ Create/keep roughly this tree (adjust only if a stage requires it):
 - [ ] Stage 5 records the current logo-asset state.
 - [ ] Node/npm facts are recorded in Verification Notes.
 
-**Status: NOT STARTED**
+**Status: COMPLETED**
 
 **Model Tier: Low**
 
 **Verification Notes:** Not verified.
+
+Completed: 2026-08-05 — Stage 0 verified: (1) repo root confirmed at `/Users/munna8/repos/ludavia_porotype`; `IMPLEMENTATION_PLAN.md` present and readable; `.git/` intact. (2) `git status` inspected: only `IMPLEMENTATION_PLAN.md` exists, with uncommitted user changes (plan audit additions) — nothing deleted, uncommitted edits preserved. (3) No conflicting app, no old “Connect & Grow AI” UI, no superseded production spec found anywhere in the tree. (4) Logo assets: NONE present — no `public/` directory and zero asset files in the repo; state recorded in Stage 5. (5) Node/npm: `node v25.8.2`, `npm 11.11.1` (`/opt/homebrew/bin/node`). **Node 25 is EOL (security support ended 2026-06-01) and is NOT an LTS line**; current supported lines as of this date are Node 24 (Active LTS “Krypton”, supported to 2028-04-30) and Node 26 (Current, enters LTS Oct 2026). No nvm/fnm/volta/asdf found on this machine. Action for Stage 1: install Node 24 LTS before scaffolding (e.g. `brew install node@24`) since the plan requires a supported current LTS; follow `astryx doctor` if it reports a different minimum.
 
 ---
 
@@ -396,7 +398,7 @@ Create/keep roughly this tree (adjust only if a stage requires it):
 
 **Model Tier: Low**
 
-**Verification Notes:** Audit found no logo assets in the repository on 2026-08-05. Re-check before executing this stage.
+**Verification Notes:** Re-checked at Stage 0 execution on 2026-08-05: still no logo assets in the repository — no `public/` directory exists and no image/asset files of any kind are present. Exact filenames and light/dark-background intent remain unknown and must be recorded here before this stage is marked complete. Re-check again before executing this stage.
 
 ---
 
