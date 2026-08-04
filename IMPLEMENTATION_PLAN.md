@@ -18,28 +18,57 @@
 **Out of scope (do not build):** marketing landing page, auth/accounts, billing, messaging, moderation, real opportunity DB, admin tools. If unsure, leave it out and note under “Future / out of scope” at the bottom of this file — do not expand scope.
 **Mobile-first CSS, desktop-strong layout** — demo is shown on a laptop.
 
+## Plan Audit Record
+
+This plan was re-verified on **2026-08-05** against the empty repository and current upstream documentation.
+
+- Repository state at audit: only `.git/` and this plan existed; no application code or logo assets were present.
+- Astryx is confirmed real and usable at `https://astryx.atmeta.com`; its current docs describe `@astryxdesign/core`, theme packages, CLI agent docs, CSS-layer rules, and React 19+ support.
+- Astryx CLI is a **development dependency**, and `astryx doctor` is the setup health check. Do not replace Astryx with shadcn, Radix, or an invented component library if installation fails; mark the stage BLOCKED and report the failure.
+- Next.js App Router pages/layouts are server components by default. Any code using `sessionStorage`, `localStorage`, `window`, GSAP, or event handlers must sit behind a client boundary.
+- Current Google Gemini documentation recommends the `@google/genai` SDK. The older `@google/generative-ai` package is not the planned integration.
+- `gemini-2.0-flash` is listed by current Google documentation as shut down. The API stage must verify the current stable fast Flash model before coding; at this audit, `gemini-3.6-flash` is listed as stable and `gemini-2.5-flash` remains a stable fallback candidate.
+- Approved logos were not present at audit time. Their exact filenames and intended background variants must be recorded before the logo stage is marked complete.
+
+This record is intentionally dated. Future agents must re-check only the version-sensitive items (Astryx package APIs and Gemini model/SDK) rather than blindly copying a stale version number.
+
+## Non-Negotiable Product And Visual Brief
+
+Use this brief to resolve small design choices without inventing new product scope.
+
+- The prototype opens directly into the product flow: splash → business-needs form → results. There is no public marketing homepage, pricing page, sign-in page, dashboard navigation, or fake account state.
+- The dark theme is the presentation default. Use near-black body surfaces, layered charcoal surfaces, quiet borders, and warm-white text. Light mode must be a designed alternate palette, not a browser default or a simple filter inversion.
+- Use the exact brand accent `#4e1d8e` for intentional actions and small emphasis. Do not create a second purple brand color. Do not use purple as the page background, a full-screen gradient, or decoration on every card.
+- Prefer Astryx semantic tokens for all colors, spacing, radii, type, and shadows. Raw hex values belong only in the LudaVia theme definition (and only where Astryx requires them).
+- Keep the interface calm and editorial: one strong headline, short supporting copy, generous negative space, a small number of confident surfaces, and clear content hierarchy. Avoid dashboard clutter, fake metrics, progress bars that imply real analytics, excessive pill badges, glassmorphism, neon glows, and card-inside-card stacks.
+- Results contain exactly one illustrative opportunity, one illustrative connection, one AI growth summary, and one recommended next step. Static examples must be labeled as illustrative/sample where necessary; never imply a real database or real person is being contacted.
+- Only the recommended next step is the dominant result action. Other card actions are secondary prototype interactions and must never compete visually or navigate to nonexistent product areas.
+- The page must be usable with keyboard, have visible focus, respect reduced motion, and maintain readable contrast in both themes. Visual polish never overrides basic accessibility.
+
 ---
 
 ## Global rules for every executing agent
 
 1. **One stage per session unless told otherwise.** Open this file, find the lowest-numbered stage with `Status: NOT STARTED` (or the stage number you were told to run), implement only that stage.
-2. **Do not skip stages.** Later stages assume earlier ones are complete.
+2. **Do not skip stages.** Later stages assume earlier ones are complete. The only exception is an external asset gate explicitly marked BLOCKED in a stage: independent code work may continue only when that stage says so and the agent records the bypass in Verification Notes.
 3. **Verify before marking complete.** Run the checks in the stage’s Acceptance Criteria. Only then change:
    - `**Status: NOT STARTED**` → `**Status: COMPLETED**`
    - Add a one-line note: `Completed: YYYY-MM-DD — <what was verified>`
 4. **Never mark COMPLETED without verification.** If blocked, set `**Status: BLOCKED**` and write why under the stage.
 5. **No drive-by refactors** outside the stage objective. No extra features.
-6. **Astryx first.** Prefer Astryx components (`Button`, `Field`, `TextInput`, `Selector`, `Card`, `Heading`, `Text`, `VStack`/`HStack`/`Grid`, `Spinner`, `Banner`, `Skeleton`, `Markdown`, etc.). Before inventing UI primitives, run:
+6. **Read the repository before editing.** Inspect the current package scripts, generated Astryx agent docs, and the files touched by earlier stages. Preserve unrelated user changes.
+7. **Astryx first.** Prefer Astryx components (`Button`, `IconButton`, `Field`, `TextInput`, `TextArea`, `Selector`, `SelectorOption`, `Card`, `Heading`, `Text`, `VStack`/`HStack`/`Grid`, `Spinner`, `Banner`, `Skeleton`, `Markdown`, etc.). Before using a component, run:
    ```bash
    npm run astryx -- component <Name> --dense
    ```
-   (after the `astryx` script exists). Read generated `AGENTS.md` / Astryx agent docs when present.
-7. **Comments:** do not add explanatory comments unless the stage explicitly asks.
-8. **When finished with a stage:** update this file’s status line for that stage, leave the working tree in a runnable state (`npm run dev` works).
+   (after the `astryx` script exists). Read generated `AGENTS.md` / Astryx agent docs when present. Never guess a prop shape from a different library.
+8. **Server/client boundary:** never import a server-only Gemini module, API key, or `server-only` module from a client component. Never call browser storage during server render.
+9. **Comments:** do not add explanatory comments unless the stage explicitly asks.
+10. **When finished with a stage:** update this file’s status line for that stage, leave the working tree in a runnable state (`npm run dev` works), and record any intentional deviation in the stage’s Verification Notes.
 
 ### Status legend
 - `NOT STARTED` — ready to pick up
-- `IN PROGRESS` — optional; set if mid-session handoff
+- `IN PROGRESS` — work started but not verified; the next session must read the Verification Notes
 - `COMPLETED` — verified against acceptance criteria
 - `BLOCKED` — cannot finish; reason documented in-stage
 
@@ -48,6 +77,10 @@
 - **Medium** — integration, moderate judgment
 - **High** — design tradeoffs, subtle UX/logic, easy-to-get-wrong polish
 - **Super-intelligent** — architectural ambiguity / hard-to-reverse cross-cutting choices
+
+### Required stage evidence
+
+Every stage must leave one concise verification note beside its status. For UI stages, include the viewport(s) and theme(s) manually checked. For integration stages, include the exact command and result. A build alone is not enough for behavior that only exists in a browser.
 
 ---
 
@@ -59,12 +92,13 @@ Create/keep roughly this tree (adjust only if a stage requires it):
 /
 ├── IMPLEMENTATION_PLAN.md          ← this file
 ├── package.json
+├── package-lock.json
 ├── next.config.ts
 ├── tsconfig.json
 ├── public/
 │   └── brand/
-│       ├── ludavia-logo-light.svg  (or .png — whatever is supplied)
-│       └── ludavia-logo-dark.svg
+│       ├── ludavia-logo-on-light.*  (illustrative placeholder name; use supplied filename)
+│       └── ludavia-logo-on-dark.*   (illustrative placeholder name; use supplied filename)
 ├── src/
 │   ├── app/
 │   │   ├── layout.tsx
@@ -78,7 +112,8 @@ Create/keep roughly this tree (adjust only if a stage requires it):
 │   │   │   └── app-providers.tsx    ← Theme + mode + any client providers
 │   │   ├── chrome/
 │   │   │   ├── app-header.tsx
-│   │   │   └── theme-toggle.tsx
+│   │   │   ├── theme-toggle.tsx
+│   │   │   └── brand-logo.tsx
 │   │   ├── splash/
 │   │   │   └── splash-screen.tsx
 │   │   ├── form/
@@ -87,86 +122,121 @@ Create/keep roughly this tree (adjust only if a stage requires it):
 │   │   │   ├── opportunity-card.tsx
 │   │   │   ├── connection-card.tsx
 │   │   │   ├── ai-summary-panel.tsx
-│   │   │   └── next-step-panel.tsx
+│   │   │   ├── next-step-panel.tsx
+│   │   │   ├── results-session-gate.tsx
+│   │   │   └── results-shell.tsx
 │   │   └── motion/
 │   │       └── gsap-*.tsx           ← as needed
 │   ├── data/
+│   │   ├── form-options.ts
 │   │   ├── sample-opportunity.ts
 │   │   ├── sample-connection.ts
 │   │   └── fallback-summary.ts
 │   ├── lib/
 │   │   ├── types.ts
-│   │   ├── theme.ts                 ← LudaVia defineTheme
-│   │   ├── session-store.ts         ← client form state handoff
-│   │   └── gemini.ts                ← server-side Gemini helper (optional)
-│   └── config/
-│       └── demo.ts                  ← GEMINI_API_KEY placeholder for demo
+│   │   ├── business-needs-schema.ts  ← shared runtime validation
+│   │   ├── theme.ts                  ← LudaVia defineTheme
+│   │   ├── session-store.ts          ← client-only form state handoff
+│   │   └── personalize.ts
+│   └── server/
+│       ├── gemini.ts                 ← server-only Gemini helper
+│       └── gemini-config.ts          ← server-only key/model config
 ├── AGENTS.md                        ← generated by astryx init (do not hand-author conventions)
 └── README.md                        ← minimal run instructions (stage that adds it)
 ```
 
 **Flow:** `/` (splash) → `/form` (business needs) → `/results` (cards + live AI summary + next step).
 
-**State handoff:** Form data lives in `sessionStorage` (and/or a tiny client store) so refresh on `/results` can still show context. No database.
+**State handoff:** Form data lives in versioned `sessionStorage` so refresh on `/results` can still show context within the same browser tab. No database. Because server components cannot read `sessionStorage`, `/results` must render a client-side session gate: show a loading shell, read storage after mount, render results when present, and `router.replace('/form')` when absent.
+
+**API key boundary:** The Gemini key is read only by `src/server/gemini-config.ts`, which must import `server-only`. Use `GEMINI_API_KEY` or a gitignored local server-only override. Do not put a real key in `NEXT_PUBLIC_*`, a client component, static demo data, this plan, or a committed fallback string that could be imported into the client graph.
 
 ---
 
 ## Stage 0 — Repo hygiene & empty-state check
 
-**Objective:** Confirm the repo is ready and this plan is the source of truth.
+**Objective:** Confirm the repo is ready, record asset/package-manager facts, and make this plan the source of truth before application code exists.
+
+**Depends on:** None.
+
+**Expected files changed:** `IMPLEMENTATION_PLAN.md` only, unless a missing asset directory needs to be documented.
 
 **Instructions:**
 1. Confirm working directory is the repo root.
-2. Confirm no conflicting app already exists (repo may be empty except git + this plan).
-3. Do not delete `IMPLEMENTATION_PLAN.md`.
-4. If logo files are already present under `public/brand/`, note their exact filenames in a short comment at the top of Stage 5 (edit this plan: add “Logo files found: …”). If absent, leave Stage 5 as-is (placeholders allowed until real assets land).
+2. Inspect the repository with a file listing and `git status`. Do not assume it is still empty; preserve any files added by the user.
+3. Confirm there is no conflicting app, old “Connect & Grow AI” UI, or superseded production spec that should be carried forward. Do not delete old user files; simply record conflicts under Verification Notes.
+4. Check for approved logo assets under `public/brand/` and any other obvious asset folder. Record exact filenames and whether each is intended for a light or dark background in Stage 5. Do not infer variant semantics from a filename alone.
+5. Confirm Node and npm versions. The executing agent must use a supported current Node LTS; if `astryx doctor` later reports a minimum version, follow that report.
+6. Do not delete `IMPLEMENTATION_PLAN.md` or `.git/`.
 
 **Acceptance criteria:**
 - [ ] `IMPLEMENTATION_PLAN.md` exists at repo root and is readable.
-- [ ] No accidental deletion of plan or `.git`.
+- [ ] `git status` has been inspected and no user files were deleted.
+- [ ] Stage 5 records the current logo-asset state.
+- [ ] Node/npm facts are recorded in Verification Notes.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: Low**
+
+**Verification Notes:** Not verified.
 
 ---
 
 ## Stage 1 — Scaffold Next.js (App Router, TypeScript)
 
-**Objective:** Create a clean Next.js app foundation.
+**Objective:** Create a clean, npm-based Next.js App Router foundation without accidentally adding a second design system.
+
+**Depends on:** Stage 0.
+
+**Expected files changed:** `package.json`, `package-lock.json`, `tsconfig.json`, `next.config.*`, `eslint.config.*`, `src/app/*`, `README.md`, and generated default files that are intentionally removed.
 
 **Instructions:**
 1. Scaffold Next.js in the repo root (not a subfolder). Prefer:
    ```bash
-   npx create-next-app@latest . --typescript --eslint --app --src-dir --import-alias "@/*" --turbopack --yes
+   npx create-next-app@latest . --typescript --eslint --app --src-dir --use-npm --import-alias "@/*" --no-tailwind --yes
    ```
-   If the tool refuses a non-empty directory because of this plan file, scaffold with flags that allow current directory, or create files manually to match create-next-app defaults. **Keep `IMPLEMENTATION_PLAN.md`.**
-2. Use **React 19** and a current Next.js 15+ release (Astryx peer requirement: React ≥ 19).
-3. **Do not** add Tailwind unless Astryx Next example requires a bridge — default path is Astryx CSS + optional StyleX later. Prefer plain CSS modules / globals for custom layout chrome.
-4. Ensure `npm run dev`, `npm run build` scripts exist.
-5. Replace default marketing boilerplate page with a minimal placeholder: heading “LudaVia” and short text “Prototype scaffold”.
-6. Add a minimal `README.md` with: project name, `npm install`, `npm run dev`, note that full instructions live in `IMPLEMENTATION_PLAN.md`.
+   If the command refuses a non-empty directory because of this plan file, scaffold manually or use the documented create-next-app option for an existing directory. **Keep `IMPLEMENTATION_PLAN.md`.** If the installed create-next-app does not recognize `--no-tailwind`, answer its prompt so Tailwind is disabled and remove any generated Tailwind wiring.
+2. Use the current stable Next.js release that supports React 19 and Astryx. Do not force an old Next version just because an example repo uses one. Keep React and `react-dom` on compatible React 19 versions.
+3. Do not add Tailwind, shadcn, Radix, Chakra, or another UI library. Astryx CSS plus local CSS modules/global app layout CSS is the intended styling path. Do not add StyleX authoring yet; consuming precompiled Astryx components does not require a StyleX compiler.
+4. Keep `moduleResolution: "bundler"` (or the current create-next-app equivalent) so Astryx CSS/subpath imports resolve.
+5. Ensure scripts exist for `dev`, `build`, `start`, and lint. Add a `typecheck` script using `tsc --noEmit` if the scaffold does not provide one.
+6. Replace default marketing boilerplate with a minimal placeholder at `/`: heading `LudaVia` and text `Prototype scaffold`. Do not design the real splash yet.
+7. Add a minimal `README.md` with project name, Node/npm prerequisite, `npm install`, `npm run dev`, `npm run build`, and a pointer to this plan. Do not document a Gemini key until the server-only configuration stage.
 
 **Acceptance criteria:**
 - [ ] `npm install` succeeds.
 - [ ] `npm run dev` serves a page at `/` showing the placeholder.
+- [ ] `npm run lint` succeeds.
+- [ ] `npm run typecheck` succeeds.
 - [ ] `npm run build` succeeds.
 - [ ] `src/app` App Router structure is in use.
 - [ ] `IMPLEMENTATION_PLAN.md` still present.
+- [ ] No Tailwind or competing component library was added.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: Low**
+
+**Verification Notes:** Not verified.
 
 ---
 
 ## Stage 2 — Install Astryx and generate agent docs
 
-**Objective:** Wire Meta’s Astryx design system and AI agent docs so later stages use correct components.
+**Objective:** Wire the verified Astryx design system, its CSS foundation, CLI, and agent documentation so later agents use real component APIs.
+
+**Depends on:** Stage 1.
+
+**Expected files changed:** `package.json`, `package-lock.json`, `AGENTS.md` (generated), `src/app/globals.css`, `src/app/layout.tsx`, `src/app/page.tsx`, and a client provider file.
 
 **Instructions:**
 1. Install:
    ```bash
-   npm install @astryxdesign/core @astryxdesign/theme-neutral @astryxdesign/cli
+   npm install @astryxdesign/core @astryxdesign/theme-neutral
+   npm install -D @astryxdesign/cli
    ```
+   Keep the Astryx packages on a compatible version line. Do not use `*` versions in a hand-written package file.
 2. Add package script (exact path matters for agents):
    ```json
    "astryx": "node node_modules/@astryxdesign/cli/clients/cli/bin/astryx.mjs"
@@ -175,86 +245,124 @@ Create/keep roughly this tree (adjust only if a stage requires it):
    ```bash
    npx @astryxdesign/cli init --features agents
    ```
-   (or `npx astryx init --features agents` if available). Commit to reading generated `AGENTS.md`.
-4. Import Astryx CSS in `src/app/globals.css` per Astryx getting started:
-   - `@import '@astryxdesign/core/reset.css';`
-   - `@import '@astryxdesign/core/astryx.css';`
-   - `@import '@astryxdesign/theme-neutral/theme.css';` (temporary until custom theme in Stage 3)
-5. Create a client `AppProviders` component that wraps children with Astryx `<Theme theme={neutralTheme} mode={...}>` using the **built** theme import pattern recommended for Next.js SSR when possible:
-   - Prefer `@astryxdesign/theme-neutral/built` + CSS import for no flash.
-6. Wrap root `layout.tsx` with `AppProviders`.
-7. On the placeholder page, render one real Astryx `Button` and one `Heading` to prove integration.
-8. Consult https://astryx.atmeta.com/docs/getting-started and the example app patterns under `facebook/astryx` `apps/example-nextjs` if build issues arise (StyleX is optional; CSS theme path is enough).
+   Read the generated `AGENTS.md` before writing component code. If the CLI uses a different generated filename, record it in Verification Notes and preserve it.
+4. Run the setup diagnostic:
+   ```bash
+   npm run astryx -- doctor
+   ```
+   Resolve failures. Warnings may be documented, but a missing core package, mismatched package line, or missing theme is not acceptable.
+5. Before using any component, inspect its docs with the CLI. At minimum inspect `Button`, `Heading`, `Text`, `Card`, `TextInput`, `TextArea`, `Selector`, `SelectorOption`, `Field`, `Switch`, `Banner`, `Skeleton`, `Avatar`, and `Dialog`. Do not copy prop names from this plan when the installed docs differ.
+6. Import Astryx CSS in `src/app/globals.css` according to the installed Astryx version. The baseline is core reset + Astryx base + neutral theme CSS. Declare CSS cascade layers before imports if the installed docs require it. Do not add a second global reset after Astryx.
+7. Create a client `AppProviders` component wrapping children with Astryx `<Theme>` (the current docs use `Theme` from `@astryxdesign/core/theme`). Use the built neutral theme import and theme CSS where supported by the installed package; otherwise use the documented runtime theme path and record why. For this stage, use a fixed `mode="dark"` so the app has a deterministic smoke-test mode; Stage 4 owns persistence and switching.
+8. Wrap only `{children}` in the provider from root `layout.tsx`; keep the root document server-rendered. Add `suppressHydrationWarning` to `<html>` only if the provider implementation requires it.
+9. On the placeholder page, render real Astryx `Heading`, `Text`, `Card`, and `Button` components. Do not judge integration from a native button.
+10. Consult `https://astryx.atmeta.com/docs/getting-started`, `docs migration`, `docs styling`, and `docs theme` if the installed version differs from the web examples. Do not swizzle or author StyleX components in this stage.
 
 **Acceptance criteria:**
 - [ ] Astryx packages installed; `npm run astryx -- component Button --dense` prints docs.
 - [ ] Agent docs file(s) generated (e.g. `AGENTS.md`).
-- [ ] Home page shows an Astryx Button; no console errors about missing Theme.
+- [ ] `npm run astryx -- doctor` has no failures.
+- [ ] Home page shows Astryx `Heading`, `Text`, `Card`, and `Button`; no console errors about missing Theme.
+- [ ] Astryx Button has visible padding, a filled primary treatment, and a working focus state.
+- [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
-- [ ] Light content renders with Astryx tokens (not unstyled native button only).
+- [ ] The placeholder renders with Astryx tokens in the fixed dark smoke-test mode (and a temporary light-mode check if the provider supports it), not as unstyled native controls only.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: Medium**
+
+**Verification Notes:** Not verified.
 
 ---
 
 ## Stage 3 — LudaVia custom theme (black-dominant + purple accent)
 
-**Objective:** Brand the design system: near-black dominance, accent `#4e1d8e`, working light and dark modes.
+**Objective:** Brand Astryx with a restrained LudaVia theme that has a near-black dark mode, a deliberate light mode, and the locked accent `#4e1d8e`.
+
+**Depends on:** Stage 2.
+
+**Expected files changed:** `src/lib/theme.ts`, generated theme artifacts if used, `src/app/globals.css`, `src/components/providers/app-providers.tsx`, and placeholder smoke-test markup.
 
 **Instructions:**
-1. Create `src/lib/theme.ts` using Astryx `defineTheme`:
+1. Read the installed theme/token docs first:
+   ```bash
+   npm run astryx -- docs theme --dense
+   npm run astryx -- docs tokens --dense
+   npm run astryx -- docs color --dense
+   ```
+2. Create `src/lib/theme.ts` using Astryx `defineTheme`:
    - `name: 'ludavia'`
    - `extends: neutralTheme` (from `@astryxdesign/theme-neutral`)
-   - Set accent to `#4e1d8e` for light; choose a slightly lifted purple for dark tuple if needed for contrast (e.g. light `#4e1d8e`, dark a readable lighter purple — keep hue family, do not invent a second brand color system).
-   - Bias **surfaces toward black/near-black in dark mode** and clean light grays/white in light mode via token overrides (`--color-background-*`, text, borders) as supported by `defineTheme` / token docs.
-   - Keep purple **off** large backgrounds; accent is for actions/highlights.
-2. Build the theme for SSR if CLI supports it:
+   - Set the theme’s accent-family API to the exact locked `#4e1d8e`. Do not substitute another purple in dark mode. Let Astryx derive `--color-on-accent` and related accent tokens so contrast remains coherent.
+   - Override only the documented semantic surface/text/border tokens needed to make dark mode near-black and light mode clean. A valid starting direction is: light body `#f5f3f7`/surface `#ffffff`/card `#ffffff`; dark body `#0b0a0d`/surface `#141217`/card `#1b171f`; warm-white primary text, muted secondary text, and quiet borders. Use the token names and tuple syntax accepted by the installed Astryx version, not guessed selectors.
+   - Keep purple off large backgrounds; use semantic accent tokens for buttons, small rules, selected states, and key labels.
+   - If typography is customized, use an understated display/body distinction with system fallbacks. Do not add a novelty font or make font loading a build dependency.
+3. Build the theme for SSR if the installed CLI supports it:
    ```bash
    npm run astryx -- theme build ./src/lib/theme.ts
    ```
-   Wire built CSS + built theme object into `AppProviders`. If build command fails, use runtime `defineTheme` export and document the limitation in a short note under this stage — still deliver correct colors.
-3. Update `globals.css` imports to use the LudaVia theme CSS (and keep core reset/astryx layers). Respect cascade layers if Astryx docs require explicit layer order.
-4. Typography: prefer distinctive but restrained pairing available via theme font config (avoid generic “Inter-only AI slop” if theme allows loading a quality display+body pair). Do not add flashy novelty fonts.
-5. Smoke-test primary `Button` uses accent; page background feels black-dominant in dark mode.
+   Wire the generated CSS and theme object exactly as the installed CLI documents. If the build command fails, use the documented runtime `defineTheme` path rather than inventing imports, and record the failure plus workaround in Verification Notes.
+4. Update `globals.css` so core reset/base, Astryx theme, and app CSS have intentional cascade layers. App layout rules must use semantic token variables; do not add a raw reset that zeroes Astryx component padding.
+5. Keep `AppProviders` using the LudaVia theme. Leave mode fixed to dark until Stage 4, but temporarily verify both modes by changing the provider mode during this stage or using a small test control.
+6. Smoke-test the foundation page in both modes: primary Button uses the locked accent, body is near-black in dark mode, text/borders remain readable, and no large surface is purple.
 
 **Acceptance criteria:**
-- [ ] Dark mode default or first paint feels black/near-black, not purple-washed.
-- [ ] Primary actions visibly use `#4e1d8e` (or dark-mode accent tuple).
-- [ ] Toggling `mode` between `light` and `dark` on `<Theme>` changes surfaces and text correctly (manual test via temporary buttons OK if toggle stage not done).
+- [ ] Dark mode default feels black/near-black, not purple-washed.
+- [ ] Primary actions visibly use the exact `#4e1d8e` accent in the current theme.
+- [ ] Temporarily switching Astryx `mode` between `light` and `dark` changes surfaces, text, borders, and component states coherently.
+- [ ] No raw reset has removed Astryx component padding or focus styles.
+- [ ] `npm run astryx -- doctor` still has no failures.
+- [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: High**
+
+**Verification Notes:** Not verified.
 
 ---
 
 ## Stage 4 — App chrome: header, logo slots, theme toggle + persistence
 
-**Objective:** Persistent chrome with light/dark toggle that survives refresh.
+**Objective:** Add the minimal product chrome and a binary light/dark switch whose choice survives refresh without breaking hydration.
+
+**Depends on:** Stage 3.
+
+**Expected files changed:** `src/components/providers/app-providers.tsx`, `src/components/chrome/theme-toggle.tsx`, `src/components/chrome/app-header.tsx`, `src/app/layout.tsx`, and shared app CSS.
 
 **Instructions:**
 1. Implement `ThemeToggle` client component:
-   - Cycles or switches `light` | `dark` (optional: include `system` only if it doesn’t confuse the demo — binary light/dark is preferred for investor control).
+   - Switches only `light` | `dark`; do not add a third `system` mode to the product UI.
    - Persist choice in `localStorage` key `ludavia-theme-mode`.
-   - On load, read storage before paint if possible (inline script in `layout.tsx` or careful default) to avoid wrong-theme flash.
-2. Lift mode state into `AppProviders`; pass `mode` into Astryx `<Theme>`.
-3. Build `AppHeader`:
-   - Left: logo image slot (use placeholder text “LudaVia” / “L:V” until Stage 5 assets).
-   - Right: theme toggle (Astryx `IconButton` or `Switch` + label; keep accessible `aria-label`).
+   - Use the exact Astryx `Switch` or `IconButton` API from the installed docs. An icon-only control must have a visible tooltip or accessible name; a labeled Switch is safer.
+2. Lift mode state into `AppProviders`; pass `mode` into Astryx `<Theme>`. Default to `dark` on the server and read localStorage in a client effect. If a pre-paint script is added, it may only set the initial color-scheme/mode signal and must not create a second source of truth.
+3. Avoid hydration mismatch: do not read `window` or `localStorage` during server render. Render a stable dark-mode control label until hydration if necessary, then update it. Use `suppressHydrationWarning` only for the specific root attribute that genuinely differs.
+4. Build `AppHeader`:
+   - Left: a `BrandLogo` slot/component boundary. Use a temporary text placeholder only until Stage 5; do not draw a substitute logo.
+   - Right: theme toggle with a clear accessible label such as `Switch to light mode` / `Switch to dark mode`.
    - Minimal, premium, not a marketing mega-nav. No fake account menus.
-4. Include header on form and results routes; splash may use a quieter variant or delayed chrome (decide for calm splash — header can appear after splash or as slim top bar).
-5. Default mode for first visit: **`dark`** (matches dominant black brand for the pitch room).
+5. Put header on form and results routes. Splash may use only the logo and a small theme control; never add navigation links that imply unavailable product areas.
+6. Default mode for first visit: **dark**.
+7. Use semantic Astryx tokens for header height, borders, spacing, and control surfaces. Keep tap targets at least 44px even if the visual control is smaller.
 
 **Acceptance criteria:**
 - [ ] Toggle switches light ↔ dark; entire themed UI updates.
 - [ ] Refresh keeps the selected mode.
+- [ ] A first-time visit defaults to dark.
+- [ ] Browser APIs are not accessed during server render and there are no hydration warnings.
 - [ ] Header layout works at ~390px width and ~1280px width.
+- [ ] Keyboard focus and accessible name are present on the toggle.
 - [ ] No layout shift disaster on toggle.
+- [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: Medium**
+
+**Verification Notes:** Not verified.
 
 ---
 
@@ -262,80 +370,111 @@ Create/keep roughly this tree (adjust only if a stage requires it):
 
 **Objective:** Integrate approved LudaVia logos without alteration.
 
+**Depends on:** Stage 4 and availability of the approved assets.
+
+**Expected files changed:** `public/brand/*`, `src/components/chrome/brand-logo.tsx`, `src/components/chrome/app-header.tsx`, splash component, and `README.md` only if asset setup needs documenting.
+
 **Instructions:**
-1. Expect files in `public/brand/` (names may vary). Common pattern:
-   - `ludavia-logo-light.*` — for use on light backgrounds
-   - `ludavia-logo-dark.*` — for use on dark backgrounds  
-   If files are missing when this stage runs: create the folder, add a short `public/brand/README.md` listing expected filenames, and keep text wordmark fallback. Set stage to **BLOCKED** only if you were explicitly told assets are already added and they are not; otherwise complete with fallback and note “assets pending”.
-2. Create a `BrandLogo` component:
-   - Picks light-bg vs dark-bg artwork based on current theme mode (use `useTheme` or mode from context).
-   - `alt="LudaVia"`, appropriate height (~28–36px header; larger on splash).
-   - Never recolor via CSS filters in a way that “redesigns” the mark; swap files instead.
-3. Replace header text placeholder with `BrandLogo`.
-4. Use logo on splash prominently.
+1. Inspect the actual supplied files and record their exact filenames in the Verification Notes. Do not assume that a filename containing `light` means “light-colored logo”; the user specified variants for a **light background** and a **dark background**. Confirm by opening the files or reading their supplied asset notes.
+2. If either approved variant is missing, do not redraw it and do not mark this stage COMPLETED. Set the stage to `BLOCKED`, document the missing filename/asset, and leave the implementation ready to finish when the asset arrives. A temporary text wordmark may remain for local development only.
+3. Create a `BrandLogo` component:
+   - Select the approved light-background artwork when the active mode is light and the approved dark-background artwork when mode is dark.
+   - Use `next/image` when dimensions/static optimization are appropriate; otherwise use an accessible image element with explicit dimensions. Do not use CSS filters, recoloring, cropping, or SVG edits.
+   - Set `alt="LudaVia"`; preserve the supplied aspect ratio; use approximately 28–36px visual height in the header and a larger but proportional size on splash.
+   - Add a graceful development fallback only for a missing file, never as a substitute for completing the asset gate.
+4. Replace the header placeholder with `BrandLogo` and use it on the splash. Do not add a second invented L:V mark.
 
 **Acceptance criteria:**
 - [ ] Correct logo variant shows in light mode and in dark mode.
 - [ ] Logos are not stretched/distorted; crisp on retina.
-- [ ] Fallback wordmark if file 404s (optional but recommended).
+- [ ] Supplied files are used byte-for-byte/unchanged in the app.
+- [ ] Missing assets, if any, are documented as BLOCKED rather than hidden by a fake mark.
+- [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: Low**
+
+**Verification Notes:** Audit found no logo assets in the repository on 2026-08-05. Re-check before executing this stage.
 
 ---
 
-## Stage 6 — Types, demo config, session handoff
+## Stage 6 — Types, schema, session handoff, and server-only config boundary
 
-**Objective:** Shared TypeScript types and client-side persistence for the demo flow.
+**Objective:** Establish one shared data contract for the form/results/API flow and a safe browser-only session handoff before feature screens are built.
+
+**Depends on:** Stage 4. Stage 5’s external logo asset gate is independent of these type/session contracts; if Stage 5 is BLOCKED, do not claim the brand integration is complete, but this non-visual stage may proceed and must record that bypass.
+
+**Expected files changed:** `package.json`, `package-lock.json`, `src/lib/types.ts`, `src/lib/business-needs-schema.ts`, `src/lib/session-store.ts`, `src/data/form-options.ts`, `src/server/gemini-config.ts`, `.gitignore`, and `README.md`.
 
 **Instructions:**
-1. `src/lib/types.ts` — define at least:
+1. Install the small runtime-only dependencies needed by the contracts:
+   ```bash
+   npm install zod server-only client-only
+   ```
+2. `src/lib/types.ts` — define serializable types:
    ```ts
    export type BusinessStage = 'idea' | 'early' | 'growing' | 'established';
    export type BusinessNeedsInput = {
      businessName: string;
-     businessType: string;      // e.g. SaaS, agency, retail…
+     businessType: string;
      industry: string;
      location: string;
      stage: BusinessStage;
-     mainGoal: string;          // primary growth goal
-     helpNeeded: string;        // what they want help with
-     description?: string;      // optional free text
+     mainGoal: string;
+     helpNeeded: string;
+     description?: string;
    };
+   export type RecommendedNextStep = { title: string; detail: string };
    export type GrowthSummaryResult = {
-     summary: string;           // markdown-friendly plain text
-     recommendedNextStep: {
-       title: string;
-       detail: string;
-     };
+     summary: string;
+     recommendedNextStep: RecommendedNextStep;
      source: 'gemini' | 'fallback';
    };
+   export type GeminiPayload = Omit<GrowthSummaryResult, 'source'>;
    ```
-2. `src/config/demo.ts`:
-   - `export const GEMINI_API_KEY = process.env.GEMINI_API_KEY ?? 'PASTE_DEMO_KEY_HERE';`
-   - `export const GEMINI_MODEL = 'gemini-2.0-flash';` (or current stable flash model; adjust if Google renames — pick a fast, cheap model suitable for live demo).
-   - Comment in README: for local demo, either paste key in this file **or** set `GEMINI_API_KEY` env. Prototype is not production; do not build a secrets manager.
-3. `src/lib/session-store.ts` (client-safe):
-   - `saveBusinessNeeds(data: BusinessNeedsInput)`
-   - `loadBusinessNeeds(): BusinessNeedsInput | null`
-   - `clearBusinessNeeds()`
-   - Use `sessionStorage` key `ludavia-business-needs`.
-4. No server database.
+   Keep the API payload type separate from the UI result type so the server, not the model/client, owns `source`.
+3. `src/data/form-options.ts` — export the single source of truth for visible labels/values for business type, stage, main goal, and help needed. The form, demo-fill control, validation, and demo script must use these values rather than duplicating strings.
+4. `src/lib/business-needs-schema.ts` — implement a Zod runtime validator used by both form submission normalization and the API route. It must:
+   - Trim all strings.
+   - Reject missing required fields and an invalid stage.
+   - Cap description at 500 characters and other fields at reasonable documented limits.
+   - Return normalized data or field-level errors without throwing for ordinary invalid input.
+5. `src/lib/session-store.ts` must import `client-only` at the top and be safe to import only from client components:
+   - Use versioned key `ludavia-business-needs:v1`.
+   - Export `saveBusinessNeeds`, `loadBusinessNeeds`, and `clearBusinessNeeds`.
+   - Guard storage access for browser-only execution; never call it during server render.
+   - Catch quota/security/malformed-JSON failures and return `null` rather than crashing the demo. Clear malformed data.
+6. Create `src/server/gemini-config.ts` with `import 'server-only'` at the top. The normal path reads `process.env.GEMINI_API_KEY`; the owner may supply that variable directly in the shell/launch configuration, so an `.env` file is not required. If a literal local key is used instead, it must live only in a gitignored server-only file and never in the tracked plan/client graph.
+   Keep the key out of `NEXT_PUBLIC_*`, client modules, static data, this plan, and committed source. Do not write a fake key fallback such as `PASTE_DEMO_KEY_HERE` into a module that can enter the client graph.
+7. Keep the model name in the same server-only config. Do not use `gemini-2.0-flash`; current Google docs list it as shut down. At implementation time verify the official model list and choose one current stable fast Flash model. The audit baseline is `gemini-3.6-flash`, with `gemini-2.5-flash` as the compatibility fallback. Make the model a one-line config value so it can be changed without touching UI code.
+8. No server database, cookies, auth, or global state store. Session storage is only a same-tab prototype handoff.
 
 **Acceptance criteria:**
-- [ ] Types compile; imports work from form/results later.
-- [ ] Manual test in browser console or throwaway button: save → reload → load returns same JSON.
-- [ ] `npm run build` succeeds.
+- [ ] Types and runtime schema compile and agree on field names.
+- [ ] Form option values are centralized in one module.
+- [ ] Valid sample data normalizes; missing/invalid data produces predictable errors.
+- [ ] Browser-only storage save/load/clear works after a page reload; malformed storage does not crash.
+- [ ] `src/server/gemini-config.ts` is protected by `server-only`; no client component imports it.
+- [ ] No actual key or `NEXT_PUBLIC_GEMINI_API_KEY` exists in tracked files.
+- [ ] `npm run lint`, `npm run typecheck`, and `npm run build` succeed.
 
-**Status: NOT STARTED**  
-**Model Tier: Low**
+**Status: NOT STARTED**
+
+**Model Tier: Medium**
+
+**Verification Notes:** Not verified.
 
 ---
 
 ## Stage 7 — Splash / entry screen
 
-**Objective:** Premium first impression; route user into the product (not a marketing site).
+**Objective:** Build the calm product entry point that starts the demo without turning into a marketing landing page.
+
+**Depends on:** Stage 4 and Stage 5’s `BrandLogo` boundary. If approved assets are not available, keep the documented temporary wordmark and do not claim brand completion.
+
+**Expected files changed:** `src/app/page.tsx`, `src/components/splash/splash-screen.tsx`, and app CSS only.
 
 **Instructions:**
 1. Replace `/` page with splash experience (`SplashScreen` client component is fine).
@@ -344,28 +483,39 @@ Create/keep roughly this tree (adjust only if a stage requires it):
    - Product name LudaVia + restrained tagline (e.g. “See how your business could grow next.”)
    - Single primary CTA: “Start” / “Explore your growth” → navigates to `/form`
    - Optional secondary text line: “Investor prototype” is **not** required on-screen (avoid breaking immersion); keep README honest instead.
-3. Layout: generous whitespace, vertical center on desktop, comfortable padding on mobile. Black-dominant in dark mode.
+3. Layout: generous whitespace, vertical center on desktop, comfortable padding on mobile. Black-dominant in dark mode. Keep the primary content visible in a 768px-high laptop viewport without forcing a scroll.
 4. No GSAP required yet (Stage 16). CSS-only fade-in is OK.
 5. CTA uses Astryx primary `Button`.
+6. The splash must not mention Connect & Grow AI, pricing, features, accounts, or production claims. A small `L:V` secondary mark may appear only if it is part of the supplied approved asset; do not type-draw a new logo.
 
 **Acceptance criteria:**
 - [ ] `/` shows splash only (no long marketing page of features/pricing).
 - [ ] CTA navigates to `/form` (form can still be placeholder until Stage 8).
-- [ ] Looks intentional at laptop width and phone width.
+- [ ] Back/forward navigation does not throw.
+- [ ] Looks intentional at 390px and 1280px; no horizontal scroll.
+- [ ] The primary CTA has keyboard focus and an accessible name.
+- [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: Medium**
+
+**Verification Notes:** Not verified.
 
 ---
 
 ## Stage 8 — Business needs form UI
 
-**Objective:** Short, high-quality form capturing enough context for a credible AI summary.
+**Objective:** Build the short, high-quality business-needs form that supplies enough context for a credible AI summary without feeling like an enterprise intake workflow.
+
+**Depends on:** Stage 6 and Stage 7.
+
+**Expected files changed:** `src/app/form/page.tsx`, `src/components/form/business-needs-form.tsx`, `src/data/form-options.ts` if needed, and form-specific CSS.
 
 **Instructions:**
 1. Implement `/form` with `BusinessNeedsForm`.
-2. Use Astryx form primitives: `FormLayout`, `Field`, `FieldLabel`, `FieldStatus`, `TextInput`, `TextArea`, `Selector` / `RadioList` as appropriate. Run `npm run astryx -- component Field --dense` etc. before guessing props.
+2. Use Astryx form primitives: `FormLayout`, `Field`, `FieldLabel`, `FieldStatus`, `TextInput`, `TextArea`, `Selector`/`SelectorOption` or `RadioList` as appropriate. Run the installed CLI docs before coding; do not guess `value`, `onChange`, item, or error props.
 3. **Fields (required unless noted):**
    | Field | Control | Notes |
    |-------|---------|--------|
@@ -379,284 +529,454 @@ Create/keep roughly this tree (adjust only if a stage requires it):
    | Description | textarea optional | max ~500 chars |
 4. Single primary submit: “See opportunities” (or similar).
 5. Layout: one focused column, max-width ~560–640px, not a dense enterprise form. Progress is unnecessary (one step only).
-6. Prefill from `loadBusinessNeeds()` if user navigates back.
-7. Wire submit in Stage 9; for this stage, submit may `console.log` if needed but prefer implementing controlled state fully now.
+6. Make the form controlled with a typed initial state. Load saved data in a client effect and prefill when the user returns from results. Do not call `loadBusinessNeeds()` during server render.
+7. Keep the submit handler as a typed callback prop or local no-op until Stage 9; do not ship a `console.log` as the visible product behavior.
+8. Use the shared `form-options.ts` values. Include a small optional description counter/limit so the 500-character constraint is obvious.
+9. The form page should include the shared `AppHeader`, a concise title such as “Tell us where you are headed”, one sentence of context, and no side navigation.
 
 **Acceptance criteria:**
 - [ ] All fields render with labels; keyboard accessible.
 - [ ] Mobile: no horizontal scroll; inputs full width.
 - [ ] Desktop: centered refined column, strong hierarchy.
 - [ ] Uses Astryx components (not raw unstyled HTML inputs only).
+- [ ] Saved values prefill after navigating away and back; no browser API is used in server render.
+- [ ] Description limit is visible and enforced by the control.
+- [ ] Focus rings, labels, and helper/error text have readable contrast in both themes.
+- [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: Medium**
+
+**Verification Notes:** Not verified.
 
 ---
 
 ## Stage 9 — Form validation + navigate to results
 
-**Objective:** Validate input, persist session, go to `/results`.
+**Objective:** Validate and normalize the form, persist one session payload, and navigate into the results route without creating a server/client boundary bug.
+
+**Depends on:** Stage 8.
+
+**Expected files changed:** `src/components/form/business-needs-form.tsx`, `src/app/form/page.tsx`, `src/lib/business-needs-schema.ts` only if a defect is found, and the minimal `/results` route entry if it does not yet exist.
 
 **Instructions:**
 1. On submit:
-   - Trim strings; require all non-optional fields.
-   - Show inline `FieldStatus` errors; focus first invalid field.
-   - Character limits: name/type/industry/location reasonable (e.g. 80–120); description 500.
-2. On success: `saveBusinessNeeds(data)` then `router.push('/results')`.
-3. `/results` page: if no session data, redirect to `/form` or show a calm empty state with link back to form (prefer redirect for demo reliability).
-4. Optional: disable submit button while navigating.
+   - Run the shared normalizer/validator; do not duplicate validation rules in JSX.
+   - Show inline `FieldStatus` errors associated with each control and focus the first invalid control.
+   - Keep the user’s values in the form when invalid.
+2. On success, call `saveBusinessNeeds(normalizedData)` and then `router.push('/results')`. Disable the submit action while navigation is pending so a presenter cannot create duplicate transitions.
+3. If no results route exists yet, create only a harmless placeholder route so successful navigation has a destination. Do not try to server-redirect based on sessionStorage or implement the final session gate here; Stage 11 owns the client `ResultsSessionGate` that reads storage after mount, shows a stable loading shell, renders content when present, and calls `router.replace('/form')` when absent.
+4. If storage write fails, show a recoverable inline/banner error and stay on the form; do not navigate to a results page that cannot recover its input.
 
 **Acceptance criteria:**
 - [ ] Empty submit shows errors and does not navigate.
 - [ ] Valid submit writes sessionStorage and lands on `/results`.
-- [ ] Visiting `/results` cold (no data) does not crash; recovers via redirect or CTA.
+- [ ] Invalid long input is rejected consistently with the shared schema.
+- [ ] The first invalid field receives focus.
+- [ ] Valid submission reaches a harmless `/results` placeholder without crashing; final cold-tab redirect behavior is verified in Stage 11.
+- [ ] Double-clicking submit does not create duplicate navigation or corrupted storage.
+- [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: Low**
+
+**Verification Notes:** Not verified.
 
 ---
 
 ## Stage 10 — Sample opportunity + connection data
 
-**Objective:** Curated static demo cards that feel relevant (not a real DB).
+**Objective:** Create exactly one typed, believable, clearly illustrative opportunity and one typed, believable, clearly illustrative connection that can be lightly personalized without pretending a real database exists.
+
+**Depends on:** Stage 6 and Stage 9.
+
+**Expected files changed:** `src/data/sample-opportunity.ts`, `src/data/sample-connection.ts`, `src/lib/personalize.ts`, and `src/data/fallback-summary.ts` only if fallback copy is colocated.
 
 **Instructions:**
 1. `src/data/sample-opportunity.ts` — export one rich opportunity object, e.g.:
-   - title, organization/program name, type (grant / pilot / partnership / accelerator), location/scope, deadline or timeframe, whyItFits (1–2 sentences with `{{industry}}` / `{{goal}}` placeholders), ctaLabel
+   - title, fictional organization/program name, type (grant / pilot / partnership / accelerator), location/scope, timeframe, whyItFits (1–2 sentences with `{{industry}}` / `{{goal}}` / `{{location}}` placeholders), ctaLabel
+   - Include an `isIllustrative: true`/display label if useful. Do not use a real deadline, claim a real award, or link to a real application unless the owner explicitly supplies one.
 2. `src/data/sample-connection.ts` — one person/org connection:
-   - name, role, organization, mutualContext, expertise tags, whyConnect, location
-3. `src/lib/personalize.ts` — tiny helper to fill placeholders from `BusinessNeedsInput` so cards feel tailored without AI.
-4. Keep tone premium and realistic. No lorem ipsum. No joke content.
-5. Do **not** build browsing, search, or multiple pages of inventory.
+   - name, role, fictional organization, mutualContext, expertise tags, whyConnect, location, and an illustrative display label
+3. `src/lib/personalize.ts` — a pure helper that fills placeholders from `BusinessNeedsInput`, safely falls back when a value is absent, and never calls Gemini.
+4. Keep copy specific enough to feel relevant but honest enough for an investor prototype. No lorem ipsum, joke content, fake traction numbers, fabricated match percentages, or claims that the connection is real.
+5. Keep the data as static modules. Do **not** build browsing, search, filters, multiple records, or a database abstraction.
 
 **Acceptance criteria:**
-- [ ] Modules export typed data + personalize helper.
-- [ ] Personalize substitutes business industry/goal/location when present.
-- [ ] `npm run build` succeeds.
+- [ ] Modules export typed data and a pure personalization helper.
+- [ ] Personalization substitutes business industry/goal/location when present and leaves no unresolved `{{...}}` tokens.
+- [ ] Opportunity and connection are visibly identifiable as illustrative/sample content where they could otherwise be mistaken for real records.
+- [ ] No additional records, search UI, or data-fetching layer exists.
+- [ ] `npm run lint`, `npm run typecheck`, and `npm run build` succeed.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: Low**
+
+**Verification Notes:** Not verified.
 
 ---
 
 ## Stage 11 — Results page layout shell
 
-**Objective:** Structure the results experience before filling every widget.
+**Objective:** Build the results route and its browser-only session gate so the results experience is structurally correct before AI/card details are filled in.
+
+**Depends on:** Stage 6, Stage 9, and Stage 10.
+
+**Expected files changed:** `src/app/results/page.tsx`, `src/components/results/results-session-gate.tsx`, `src/components/results/results-shell.tsx`, and layout CSS.
 
 **Instructions:**
-1. Build `/results` layout:
+1. Keep `src/app/results/page.tsx` a small server component that renders the client `ResultsSessionGate`. It must not import or call `sessionStorage`.
+2. Implement `ResultsSessionGate` as a client component:
+   - Initial state is `loading`; render a layout-shaped skeleton, not a blank page.
+   - In `useEffect`, call `loadBusinessNeeds()` once after mount.
+   - If data is missing/invalid, call `router.replace('/form')` and render a minimal transition message while navigation occurs.
+   - If data exists, render `ResultsShell` with the serializable profile.
+   - Clean up any mounted effect and do not call the AI route from the gate.
+3. Build `ResultsShell` layout:
    - Top: short recap line from session (“Growth snapshot for {businessName} · {industry} · {location}”) + text button “Edit details” → `/form`.
    - Main grid (desktop): **two cards side-by-side** (opportunity | connection), then **full-width AI summary**, then **recommended next step**.
    - Mobile: single column, same order: opportunity → connection → summary → next step.
-2. Use Astryx `Grid`, `Section`, `Heading`, `Text`, `Card` shells with skeleton placeholders inside summary area for now.
-3. Ensure header + theme toggle still present.
-4. Max content width ~1040–1120px centered; generous vertical rhythm.
+4. Use Astryx `Grid`, `Section`, `Heading`, `Text`, `Card` shells with skeleton placeholders inside summary and next-step areas for now. Use the result structure from the visual brief: cards first, featured AI insight below, one next-step action at the end.
+5. Ensure header + theme toggle remain present. Keep the maximum content width around 1040–1120px, with generous vertical rhythm and no sidebar.
+6. Keep results content below the header in a laptop-height first viewport where practical; the page may scroll, but the title and first two cards should be visible without excessive empty space.
 
 **Acceptance criteria:**
 - [ ] With session data present, layout matches the structure above at 1280px and 390px.
+- [ ] Refreshing `/results` in the same tab restores the profile after the loading shell.
+- [ ] Opening `/results` in a fresh tab redirects to `/form` without a server-render exception.
 - [ ] Edit details returns to form with data prefilling (from Stage 8/6).
 - [ ] No crash without AI wired yet.
+- [ ] Loading shell has no layout jump large enough to disrupt the demo.
+- [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: Medium**
+
+**Verification Notes:** Not verified.
 
 ---
 
 ## Stage 12 — Opportunity card + connection card UI
 
-**Objective:** High-polish sample cards that look investor-real.
+**Objective:** Turn the two static examples into polished, scannable result cards that feel credible while clearly remaining prototype content.
+
+**Depends on:** Stage 10 and Stage 11.
+
+**Expected files changed:** `src/components/results/opportunity-card.tsx`, `src/components/results/connection-card.tsx`, optional simple dialog/toast components, and result CSS.
 
 **Instructions:**
-1. `OpportunityCard` — use Astryx `Card`, `Badge`/`Token` for type, clear title, org, timeframe, personalized “Why this fits”, secondary button “View details” that can open an Astryx `Dialog` with the same content expanded (dialog is optional but nice; if dialog, keep simple — no real navigation).
-2. `ConnectionCard` — avatar initials via `Avatar`, name, role, org, tags, personalized why, CTA “Request intro” (button may be non-functional or toast “Prototype: intro flow coming soon” via Astryx toast — **no real messaging**).
-3. Personalize with session business needs.
-4. Visual hierarchy: scannable in 3 seconds. Purple only on primary actions / small accents.
-5. Do not use generic multi-column dashboard clutter.
+1. `OpportunityCard` — use Astryx `Card`, `Badge`/`Token` only where semantically useful, clear title, fictional organization, type, scope/timeframe, personalized “Why this fits”, and one secondary action. A “View details” action may open a simple Astryx `Dialog`; it must not navigate to a nonexistent detail route.
+2. `ConnectionCard` — use Astryx `Avatar` with local initials, name, role, fictional organization, expertise tags, personalized why, and a secondary “Request intro” action. It may show a non-blocking prototype toast, but it must not create messaging state, contact a person, or imply that an introduction was sent.
+3. Pass the normalized `BusinessNeedsInput` into both cards and personalize only display copy. Do not send card data to Gemini.
+4. Add small “Illustrative opportunity” / “Illustrative connection” labeling where needed. Never show a fake match score, verified badge, social proof, or real-world deadline.
+5. Visual hierarchy must be scannable in three seconds. Purple is limited to the primary result action later, small accent rules, or selected states. Do not make every badge purple.
+6. Use a consistent card composition and equal-height behavior on desktop without forcing awkward fixed heights on mobile. Do not build generic dashboard grids.
 
 **Acceptance criteria:**
 - [ ] Both cards render personalized copy from session data.
 - [ ] Desktop side-by-side; mobile stacked.
-- [ ] CTAs do not break demo (no dead error throws).
+- [ ] Illustrative labels are visible and honest.
+- [ ] Secondary actions do not 404, throw, create a real message, or imply external side effects.
+- [ ] No fake metrics or unresolved placeholders appear.
+- [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: Medium**
+
+**Verification Notes:** Not verified.
 
 ---
 
 ## Stage 13 — Gemini API route (server)
 
-**Objective:** Real Gemini call returning summary + next step JSON.
+**Objective:** Implement the minimal server-side Gemini integration that returns a validated live summary and exactly one recommended next step.
+
+**Depends on:** Stage 6, Stage 10, and the results shell from Stage 11.
+
+**Expected files changed:** `package.json`, `package-lock.json`, `src/lib/growth-summary-schema.ts`, `src/server/gemini.ts`, `src/server/gemini-config.ts` if needed, `src/app/api/generate-summary/route.ts`, and shared output-schema code.
 
 **Instructions:**
-1. Add dependency: `@google/generative-ai` (official SDK) **or** use `fetch` to the Gemini REST endpoint. Prefer official SDK if maintained.
-2. Implement `POST src/app/api/generate-summary/route.ts`:
-   - Body: `BusinessNeedsInput` JSON.
-   - Validate required fields; `400` if invalid.
-   - Build a tight system/user prompt:
-     - You are LudaVia’s growth strategist.
-     - Given the business profile, write: (1) a concise growth summary (120–180 words, 2–3 short paragraphs or markdown bullets), specific to their industry/stage/goal; (2) exactly one recommended next step with `title` (≤8 words) and `detail` (1–2 sentences).
-     - Tone: confident, concrete, premium, no hype fluff, no mention of being an AI demo.
-     - Return **JSON only** matching `GrowthSummaryResult` without `source` (server sets `source: 'gemini'`).
-   - Call Gemini with the demo key from `src/config/demo.ts` / env.
-   - Parse JSON (strip markdown fences if model wraps them).
-   - On success: `200` with `GrowthSummaryResult`.
-   - On failure: `502` or `500` with `{ error: string }` — **do not** silently succeed.
-3. Set reasonable timeout; use a fast model for live demos.
-4. Never expose the API key to the client bundle (server route / server-only module only).
-5. Manual test with curl or a temporary client fetch once key is pasted.
+1. Install the current official JavaScript SDK:
+   ```bash
+   npm install @google/genai
+   ```
+   Do not install or use the older `@google/generative-ai` package. If the current SDK API differs from the examples below, read its installed types and current Google docs and use one coherent API; do not mix method names from both SDKs.
+2. Create `src/lib/growth-summary-schema.ts` as a shared, server/client-safe Zod schema for `GeminiPayload`. It must validate the same constraints used in the prompt (non-empty summary, one nested next step, title no longer than 8 words, reasonable detail length). Derive or align the TypeScript type without adding `source` to the provider payload schema.
+3. Implement `src/server/gemini.ts` as a server-only helper. It must import `server-only`, read the key/model only from `gemini-config.ts`, and expose one function that accepts `BusinessNeedsInput` and returns a validated `GeminiPayload`.
+4. Implement `POST src/app/api/generate-summary/route.ts`:
+   - Set the Node runtime if the SDK requires it; do not assume Edge compatibility.
+   - Set the route to dynamic/no-store behavior so a user’s business profile is never cached as a static response.
+   - Parse JSON body with the Web `Request` API. Reject malformed JSON, non-object payloads, missing required fields, invalid stage, and overlong strings with `400` and a small field-error object.
+   - Build a prompt that clearly delimits the profile as untrusted data and says profile text is data, not instructions. Ask the model to act as a LudaVia growth strategist.
+   - Require a concise, specific growth summary of roughly 120–180 words and exactly one recommended next step. The step has `title` of at most 8 words and `detail` of 1–2 sentences. Tone is concrete, calm, useful, and premium; no hype, guarantees, fabricated statistics, or mention of this being a demo.
+   - Request structured JSON using the current SDK’s structured-output mechanism. The schema is exactly:
+     ```json
+     {
+       "type": "object",
+       "properties": {
+         "summary": { "type": "string" },
+         "recommendedNextStep": {
+           "type": "object",
+           "properties": {
+             "title": { "type": "string" },
+             "detail": { "type": "string" }
+           },
+           "required": ["title", "detail"],
+           "additionalProperties": false
+         }
+       },
+       "required": ["summary", "recommendedNextStep"],
+       "additionalProperties": false
+     }
+     ```
+     Use the exact field names expected by the installed SDK (`response_format`/`mime_type` for the current Interactions API or the equivalent documented model config). Do not rely on prompt-only JSON if structured output is supported.
+   - Parse the SDK response text, then validate it again with the shared runtime output schema. Reject empty summary, missing nested fields, a title over 8 words, or malformed output as provider failure.
+   - On success, return `200` JSON with `{summary, recommendedNextStep, source: 'gemini'}` and `Cache-Control: no-store`.
+   - On missing key/config, return `503`. On provider timeout/error or invalid provider output, return `502`. Return generic client-safe error text; log diagnostic detail only on the server and never log the key or full user description.
+5. Use one current stable fast Flash model from `gemini-config.ts`. At the 2026-08-05 audit, Google lists `gemini-3.6-flash` as stable and `gemini-2.5-flash` as a stable compatibility option; verify availability for the supplied key before finalizing. Never use the shut-down `gemini-2.0-flash`.
+6. Bound the provider request so a hung call cannot hold the pitch indefinitely. The client will also have a timeout in Stage 14; use the SDK’s supported abort/timeout mechanism or a server-side race that safely ignores late results.
+7. Never expose the API key to the client bundle. `server-only` must make an accidental client import fail at build time. The API route is the only UI-facing boundary.
+8. Manual-test the route with a valid demo key when available, and separately with no key, malformed body, invalid stage, and a deliberately invalid model/key. Do not put the real key in a curl command committed to a file.
 
 **Acceptance criteria:**
-- [ ] With a valid key and body, route returns JSON containing `summary` and `recommendedNextStep`.
-- [ ] Invalid body → 400.
-- [ ] Missing/invalid key → error response (not a 200 with empty success).
-- [ ] API key not present in client JS bundle (grep `.next` / ensure server-only import).
-- [ ] `npm run build` succeeds.
+- [ ] `@google/genai` is installed; `@google/generative-ai` is not used.
+- [ ] `growth-summary-schema.ts` is shared safely by server and client and rejects malformed provider output.
+- [ ] With a valid key/model and body, route returns JSON containing a non-empty `summary`, one `recommendedNextStep`, and `source: 'gemini'`.
+- [ ] Invalid body → `400` with field-level error information.
+- [ ] Missing key → `503`; provider failure/invalid output → `502`; no failure returns a fake success object.
+- [ ] The output is schema-validated and the next-step title is at most 8 words.
+- [ ] Response is not cached.
+- [ ] API key is not present in client JS or browser network request to Google; only the same-origin route is called by the UI.
+- [ ] `npm run lint`, `npm run typecheck`, and `npm run build` succeed.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: Medium**
+
+**Verification Notes:** Not verified. Current model/SDK facts were audited on 2026-08-05 and must be rechecked at implementation time.
 
 ---
 
 ## Stage 14 — AI summary panel (live client integration)
 
-**Objective:** Results page fetches live summary and renders it beautifully.
+**Objective:** Fetch the same-origin Gemini route once for the active profile and render the live insight as a polished, non-blocking results section.
+
+**Depends on:** Stage 11, Stage 12, and Stage 13.
+
+**Expected files changed:** `src/components/results/ai-summary-panel.tsx`, `src/components/results/results-shell.tsx`, `src/lib/types.ts` only if state types need refining, and result CSS.
 
 **Instructions:**
 1. `AiSummaryPanel` client component:
-   - On mount (when business needs available), `POST /api/generate-summary`.
-   - Loading state: Astryx `Skeleton` and/or `Spinner` + calm copy (“Analyzing your growth context…”) — must look premium for 2–5s waits.
-   - Success: render summary with Astryx `Markdown` if available, else formatted paragraphs. Show a subtle badge “Live insight” when `source === 'gemini'`.
-   - Pass `recommendedNextStep` up via callback/props to Stage 15 component (lift state in results page).
-2. Avoid double-fetch in React Strict Mode by using an abort controller + ignore flag, or a simple ref guard.
-3. Do not block rendering of opportunity/connection cards on AI — cards show immediately; summary streams in below.
+   - Accept the normalized profile as a prop; do not read sessionStorage again inside the panel.
+   - On mount/profile change, `POST /api/generate-summary` with only the needed profile JSON. Do not call Google directly from the browser.
+   - Loading state: Astryx `Skeleton` and/or `Spinner` plus calm copy such as “Reading your growth context…”. It must preserve the final panel height enough to avoid a large layout jump.
+   - Success: render the returned summary as safe text/paragraphs or Astryx `Markdown` only if the installed component safely handles the returned content. Do not use `dangerouslySetInnerHTML`. Show a subtle `Live insight` status.
+   - Parse and validate the response with the shared `growth-summary-schema.ts` before rendering. Add `source: 'gemini'` only after validation, then report the validated `GeminiPayload`/`GrowthSummaryResult` to the results shell through a typed callback or lifted state. Do not let the panel own the recommended-step panel’s layout.
+2. Use an `AbortController` and a request identity/ignore guard. React Strict Mode, rapid navigation, and a changed profile must not allow an old response to overwrite the current profile. Do not use a ref guard that prevents a legitimate new profile request.
+3. Set a client timeout around 8–10 seconds. Treat timeout, non-2xx response, invalid JSON, and invalid output as the same failure state for Stage 15.
+4. Do not block opportunity/connection rendering on AI. Cards render immediately; the summary panel loads below them. Do not show a fake “live” label while loading.
+5. Keep the summary section semantically labeled (`h2`/`aria-live` only where appropriate) and ensure loading status is not announced repeatedly by screen readers.
 
 **Acceptance criteria:**
 - [ ] Submitting form → results shows cards immediately and summary loading → live text.
-- [ ] Strict Mode double-mount does not produce duplicate visible errors (at most one in-flight logical request UX).
+- [ ] Strict Mode double-mount does not create duplicate visible errors or stale content.
+- [ ] A profile change or unmount aborts/ignores the old request.
+- [ ] Timeout and non-2xx responses enter a typed failure state without an uncaught exception.
+- [ ] Browser network shows only `POST /api/generate-summary`, never a request to Google or an exposed key.
 - [ ] Readable typography; good contrast in light and dark.
+- [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: Medium**
+
+**Verification Notes:** Not verified.
 
 ---
 
 ## Stage 15 — Recommended next step + graceful AI fallback
 
-**Objective:** Always show a strong next step; demo never dies if Gemini fails.
+**Objective:** Guarantee a useful summary and one clear next step in every network condition, while making the live Gemini result visibly distinguishable from prepared fallback content.
+
+**Depends on:** Stage 13 and Stage 14.
+
+**Expected files changed:** `src/components/results/next-step-panel.tsx`, `src/data/fallback-summary.ts`, `src/components/results/ai-summary-panel.tsx`, `src/components/results/results-shell.tsx`, and result CSS.
 
 **Instructions:**
-1. `NextStepPanel`:
+1. `src/data/fallback-summary.ts`:
+   - Export a high-quality prepared summary function/data with `source: 'fallback'`.
+   - Personalize lightly with the business name/goal/industry using the pure helper. Keep the fallback specific enough to be useful but never claim it came from Gemini.
+   - Include exactly one `recommendedNextStep`.
+2. Render the prepared fallback result as the initial next-step content while the live request is loading. This guarantees a visible recommended action even if the API is slow; the successful Gemini response replaces it atomically.
+3. `NextStepPanel`:
    - Highlighted card/section with accent border or quiet purple left rule (restrained).
    - Label: “Recommended next step”.
-   - Title + detail from AI when available.
-   - Primary CTA button: e.g. “Start this step” — may `toast` prototype message or scroll to opportunity card; must not 404.
-2. `src/data/fallback-summary.ts`:
-   - High-quality static `GrowthSummaryResult` with `source: 'fallback'`.
-   - Personalize lightly with business name/goal via helper.
-3. In `AiSummaryPanel` error/timeout path:
-   - Use fallback content automatically.
-   - Show a non-alarming `Banner` or muted text: “Showing a prepared insight while live generation is unavailable.” — **never** a red stack trace or blank panel mid-pitch.
-4. Results page always ends with a visible next step within a few seconds max (if Gemini hangs, client timeout ~8–12s then fallback).
+   - Title + detail from the latest valid live result or personalized fallback.
+   - One dominant CTA such as “Start with this step”. It may scroll to the illustrative opportunity, open a harmless prototype toast, or focus a relevant section. It must not 404, send a message, create an account, or imply an external side effect.
+4. In `AiSummaryPanel` error/timeout/malformed-output path:
+   - Replace loading with fallback content automatically.
+   - Show a non-alarming Astryx `Banner` or muted status: “Showing a prepared insight while live generation is unavailable.” Never show a stack trace, raw provider error, empty panel, or red error treatment that makes a live pitch look broken.
+5. In the results shell, keep the fallback next step visible during loading, and replace it only after the live payload has passed client validation. Show `Live insight` only for `source === 'gemini'`; show `Prepared insight`/the fallback banner otherwise.
+6. If live generation fails, preserve the opportunity/connection cards and the user profile. Do not force the presenter back to the form.
 
 **Acceptance criteria:**
 - [ ] Forced API failure (bad key or offline) still shows summary + next step fallback.
 - [ ] Live success path shows Gemini content and next step without fallback banner.
 - [ ] Timeout path falls back cleanly.
+- [ ] A recommended next step is visible during loading, after success, and after failure.
+- [ ] The fallback is clearly labeled as prepared and never claims to be live AI.
 - [ ] Investor can always point to one clear next action on screen.
+- [ ] Only one result CTA is visually dominant; secondary card actions remain secondary.
+- [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: Medium**
+
+**Verification Notes:** Not verified.
 
 ---
 
 ## Stage 16 — GSAP motion (load, reveal, transitions)
 
-**Objective:** “Wow” motion without gimmicks; 60fps feel on laptop.
+**Objective:** Add restrained GSAP motion that gives the demo a premium sense of arrival without delaying interaction or creating hydration/performance problems.
+
+**Depends on:** Stages 7–15, so motion is applied to stable final surfaces rather than placeholders.
+
+**Expected files changed:** `package.json`, `package-lock.json`, splash/form/results client motion wrappers, and app CSS.
 
 **Instructions:**
-1. Install `gsap` (and `@gsap/react` if desired).
-2. Splash: elegant logo/title fade-up + CTA slight delay; optional very short preloader (logo pulse → content) **only if** it stays under ~1.2s and can be skipped on repeat visits (`sessionStorage` flag).
-3. Form: subtle section enter (opacity/y); no jank on inputs.
-4. Results: staggered card reveal (opportunity, connection, then summary area); text reveal for headings via split lines **or** simple fade-up if split is fragile.
-5. Respect `prefers-reduced-motion`: skip/minimize animations.
-6. Kill tweens on unmount; no memory leaks.
-7. Do not animate layout properties that cause expensive reflow thrash; prefer transform/opacity.
-8. Keep purple/motion tasteful — this is editorial premium, not a game trailer.
+1. Install `gsap`. Use `@gsap/react` and its documented `useGSAP`/context cleanup pattern if compatible with the installed React/GSAP versions. Do not add SplitText or other paid/optional plugins.
+2. Use client-only motion components. Register any plugins in a client module and scope animations to a root ref. Kill/revert animations on unmount.
+3. Splash: logo/title fade-up and CTA reveal with a short, confident sequence. Do not add a preloader by default; only add one if a real asset-loading need is observed, it stays under ~1.2s, and it never hides the CTA on repeat visits.
+4. Form: one subtle section entrance using opacity/transform. Do not animate input values, validation, focus, or layout while the user types.
+5. Results: stagger opportunity card, connection card, featured AI summary, then next-step panel. If using scroll-triggered reveals, use `ScrollTrigger` only where content is below the fold and ensure refresh/cleanup works. A simple enter stagger is preferable to fragile text splitting.
+6. Respect `prefers-reduced-motion: reduce` through `gsap.matchMedia()` or equivalent. Reduced motion must remove non-essential movement while preserving visibility and state changes.
+7. Animate transform and opacity, not width/height/top/left or large blur filters. Keep sequences short enough that the presenter can interact immediately.
+8. Keep motion quiet and editorial: no perpetual loops, bouncing CTAs, cursor-followers, screen wipes, or purple/neon effects.
 
 **Acceptance criteria:**
-- [ ] Splash animation plays once per visit path and looks smooth.
-- [ ] Results cards stagger in without blocking interaction for long.
+- [ ] Splash animation plays on entry and does not block interaction for more than a brief reveal.
+- [ ] Results cards stagger in without blocking interaction for long and do not re-run unexpectedly on every state update.
 - [ ] `prefers-reduced-motion: reduce` disables non-essential motion.
-- [ ] No hydration warnings from GSAP misuse (run animations in `useEffect` / client only).
+- [ ] No hydration warnings from GSAP misuse; all browser/GSAP work is client-only.
+- [ ] Navigating away and back does not leave stale tweens or duplicate triggers.
+- [ ] Motion remains smooth at 1280px and usable at 390px.
+- [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: High**
+
+**Verification Notes:** Not verified.
 
 ---
 
 ## Stage 17 — Responsive polish & laptop demo pass
 
-**Objective:** Pixel-feel confidence for a live investor meeting on a laptop, plus credible mobile.
+**Objective:** Make the final experience presentation-ready on a laptop while preserving a credible mobile-first layout.
+
+**Depends on:** Stages 4–16.
+
+**Expected files changed:** shared CSS, route/layout metadata, and only targeted component fixes found during QA.
 
 **Instructions:**
-1. Test at widths: 390, 768, 1024, 1280, 1440.
-2. Fix: overflow, uneven gaps, weak tap targets (<44px), header collision, form keyboard issues.
-3. Desktop: tighten alignment of the two cards; ensure summary reads like a featured editorial block.
-4. Verify theme toggle and logos at each breakpoint.
-5. Loading and fallback states re-checked visually in both themes.
-6. Performance: no huge unoptimized images; logos appropriately sized.
-7. Add `metadata` in root layout: title `LudaVia`, description short.
+1. Test the actual running app at widths 390, 768, 1024, 1280, and 1440px. Use both light and dark modes, a fresh tab, a reloaded results tab, and a slow/failing API condition.
+2. Fix overflow, clipped text, uneven gaps, weak tap targets (<44px), header collisions, selector/dialog positioning, form keyboard behavior, and focus visibility.
+3. Desktop: align the two illustrative cards cleanly, keep the result title and profile recap prominent, and make the AI summary read like a featured editorial block rather than a generic chat bubble.
+4. Mobile: keep the same content order, stack cards naturally, preserve readable line lengths, and avoid sticky controls that cover content.
+5. Verify theme toggle, logo variants, card surfaces, borders, focus states, loading skeletons, fallback banners, and motion at every required breakpoint.
+6. Check performance: no huge unoptimized images, no duplicated logos, no unnecessary API request loops, and no animation that blocks the main content. Keep all custom CSS token-backed.
+7. Add root metadata: title `LudaVia` and a concise description describing the growth snapshot prototype. Remove all create-next-app default metadata/assets/copy.
+8. Take screenshots or otherwise record a visual check for splash, form, results-success, results-loading, results-fallback, and both themes. This is a visual acceptance gate, not just a build gate.
 
 **Acceptance criteria:**
 - [ ] No horizontal scroll at 390 or 1280.
 - [ ] Demo path splash → form → results completable with mouse only in <60 seconds of user time (excluding AI latency).
+- [ ] The first laptop viewport shows product identity, profile context, and the first result content without excessive empty space.
+- [ ] Form remains comfortable and fully usable at 390px.
 - [ ] Both themes look intentionally designed (not “inverted colors only”).
+- [ ] Loading, live success, timeout, and fallback states are understandable without developer tools.
+- [ ] Keyboard-only pass reaches every control in a logical order.
+- [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: High**
+
+**Verification Notes:** Not verified.
 
 ---
 
 ## Stage 18 — End-to-end demo script hardening
 
-**Objective:** Make the happy path bulletproof for a pitch.
+**Objective:** Make the exact investor pitch path repeatable, fast, and resilient when Gemini or Wi-Fi is imperfect.
+
+**Depends on:** Stages 1–17.
+
+**Expected files changed:** `DEMO_SCRIPT.md`, the form component for a presenter-only fill affordance, `README.md`, and bug fixes only.
 
 **Instructions:**
 1. Create `DEMO_SCRIPT.md` at repo root with:
    - Exact click path and sample spoken lines (60–90 seconds).
    - Sample form values that produce a strong Gemini story (pick one coherent fictional business).
    - What to do if Wi‑Fi dies (fallback already on screen).
-   - How to set the Gemini key (`src/config/demo.ts` or env).
-2. Seed optional “Demo fill” ghost control on the form: small text button “Use sample business” that fills fields with the script’s sample values (very useful live). Not a second product feature — a presenter aid. Hide it visually as subtle text link under the form.
-3. Verify cold start: `npm run build && npm run start` production mode once.
-4. Fix any bugs found; do not add new features.
+   - How to set the Gemini key through the server-only environment/local override, without committing it.
+   - How to force/recognize fallback mode and reset the same-tab session.
+2. Add a subtle presenter-only “Use sample business” text control under the form. It fills the exact values in the script, uses shared option values, does not submit automatically, and is not framed as a product feature. It must be keyboard accessible and visually subordinate.
+3. Verify a production cold start using separate commands:
+   ```bash
+   npm run lint
+   npm run typecheck
+   npm run build
+   npm run start
+   ```
+   Then exercise the actual production server in a browser. Do not leave `next start` running as a hidden dependency for later agents.
+4. Run the demo at least twice: once with a live key and once with a forced fallback. Reset session state between runs. Fix only defects found in the existing scope; do not add new features.
 
 **Acceptance criteria:**
 - [ ] `DEMO_SCRIPT.md` exists and matches the actual UI labels.
-- [ ] “Use sample business” fills valid values and submits successfully.
+- [ ] “Use sample business” fills valid values and the form submits successfully when the presenter clicks the real submit action.
 - [ ] Production server serves the full flow.
 - [ ] Fallback verified once with key removed/invalid.
+- [ ] Live and fallback runs both leave the investor with a summary and one next step.
+- [ ] No real key is committed to source, docs, or shell history copied into the repo.
+- [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: Medium**
+
+**Verification Notes:** Not verified.
 
 ---
 
 ## Stage 19 — Final QA checklist (release gate)
 
-**Objective:** Sign-off pass; only bugfixes.
+**Objective:** Perform the final release gate against the requested prototype scope; only fix defects, do not expand the product.
+
+**Depends on:** Stage 18.
+
+**Expected files changed:** only targeted bug fixes, this plan’s final status block, and the final build-status note.
 
 **Instructions:**
-Run through this checklist and fix failures only:
+Run through this checklist in a real browser against the production build and fix failures only. Record browser/OS, model used, and whether a live key was available in Verification Notes.
+
+**Acceptance criteria:**
 
 ### Functional
 - [ ] Splash CTA → form
@@ -667,17 +987,24 @@ Run through this checklist and fix failures only:
 - [ ] Fallback works without key / on error
 - [ ] Next step always visible after load/fallback
 - [ ] Theme toggle persists
+- [ ] Reloading results in the same tab restores the profile; fresh tab returns to form
+- [ ] No duplicate Gemini request after Strict Mode/navigation
 
 ### Brand / UI
 - [ ] Black-dominant dark theme; purple used sparingly
 - [ ] Logos correct per theme; not redrawn
 - [ ] No “Connect & Grow AI” naming anywhere in UI
 - [ ] No leftover Next.js default assets/copy
+- [ ] Opportunity and connection are visibly illustrative, not falsely presented as live records
+- [ ] Only one result action is visually dominant
 
 ### Technical
 - [ ] `npm run build` clean
-- [ ] No secrets needed in client bundle
-- [ ] README explains install, dev, key placement, demo script pointer
+- [ ] `npm run lint` clean
+- [ ] `npm run typecheck` clean
+- [ ] No Gemini key or other secret appears in the client bundle
+- [ ] README explains install, dev, server-only key placement, and demo script pointer
+- [ ] `astryx doctor` has no failures
 
 ### Scope guard
 - [ ] No auth, billing, admin, messaging, marketing landing, or real DB added
@@ -689,8 +1016,24 @@ When all boxes pass, mark this stage COMPLETED and add at the top of this plan (
 Last verified: YYYY-MM-DD
 ```
 
-**Status: NOT STARTED**  
+**Status: NOT STARTED**
+
 **Model Tier: Medium**
+
+**Verification Notes:** Not verified.
+
+---
+
+## External Inputs Before Completion
+
+These are implementation inputs, not unresolved product decisions:
+
+- The two approved LudaVia logo files, with their actual filenames and which background each is designed for.
+- A live Gemini API key supplied through the server-only path described in Stage 6. The prototype does not need production secret infrastructure, but the key must still never enter the browser bundle.
+- A current Node/npm runtime compatible with the installed Next.js and Astryx versions.
+- A real browser pass on the laptop that will be used for the investor meeting.
+
+If one of these is missing, implement only the independent stages allowed by this plan and document the blocker. Do not invent an asset, substitute another AI provider, or quietly turn the live Gemini requirement into canned-only content.
 
 ---
 
@@ -713,12 +1056,13 @@ Last verified: YYYY-MM-DD
 
 ```
 1. Open IMPLEMENTATION_PLAN.md
-2. Search for "**Status: NOT STARTED**" (or BLOCKED)
-3. Read Orientation + Global rules + the stage body
-4. Implement only that stage
-5. Verify acceptance criteria
-6. Mark Status: COMPLETED with date + verification note
-7. Stop (or continue only if user asked for multiple stages)
+2. Find the lowest-numbered stage with "**Status: NOT STARTED**". If the lowest stage is BLOCKED, read its reason: stop and report unless the stage explicitly says independent work may proceed.
+3. Read Orientation, Plan Audit Record, Non-Negotiable Brief, Global Rules, and the selected stage body.
+4. Inspect the current repository and prior stage Verification Notes before editing.
+5. Implement only that stage and preserve earlier behavior.
+6. Run every acceptance check, including browser checks where listed.
+7. Mark Status: COMPLETED only after verification, adding date and evidence. If not verified, leave NOT STARTED or set IN PROGRESS/BLOCKED with the reason.
+8. Stop (or continue only if the user explicitly asked for multiple stages).
 ```
 
 ### Recommended model tier by stage (summary)
@@ -731,7 +1075,7 @@ Last verified: YYYY-MM-DD
 | 3     | Custom theme                  | High              |
 | 4     | Chrome + theme toggle         | Medium            |
 | 5     | Logos                         | Low               |
-| 6     | Types + session               | Low               |
+| 6     | Types + schema + session      | Medium            |
 | 7     | Splash                        | Medium            |
 | 8     | Form UI                       | Medium            |
 | 9     | Validation + nav              | Low               |
@@ -746,4 +1090,6 @@ Last verified: YYYY-MM-DD
 | 18    | Demo script hardening         | Medium            |
 | 19    | Final QA                      | Medium            |
 
-**Note on Astryx:** Confirmed live at https://astryx.atmeta.com — Meta open-source design system (`@astryxdesign/core`), React 19+, theme packages, CLI (`astryx component`, `astryx init`). Executing agents must use its docs/CLI rather than inventing component APIs.
+**Note on Astryx:** Confirmed live at https://astryx.atmeta.com — Meta open-source design system (`@astryxdesign/core`), React 19+, theme packages, CLI (`astryx component`, `astryx init`, `astryx doctor`). Executing agents must use the installed version’s docs/CLI rather than inventing component APIs. Current docs also require semantic token usage, the accent-family theme API, and deliberate CSS cascade layers.
+
+**Note on Gemini:** Current Google documentation was reachable during the audit via `https://ai.google.dev/gemini-api/docs/get-started` and `https://ai.google.dev/gemini-api/docs/models`. It recommends `@google/genai`, structured output, and a current stable Flash model. Re-check model availability when Stage 13 begins; never revive `gemini-2.0-flash`.
