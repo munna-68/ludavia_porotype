@@ -364,11 +364,11 @@ Completed: 2026-08-05 — Stage 2 verified: (1) Installed `@astryxdesign/core@0.
 - [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**
+**Status: COMPLETED**
 
 **Model Tier: Medium**
 
-**Verification Notes:** Not verified.
+**Verification Notes:** Completed: 2026-08-05 — Stage 4 verified in real browser (Playwright Chromium) against both `npm run dev` and `next start` (production) at 1280×800 and 390×844. (1) Toggle: labeled Astryx `Switch` ("Dark mode", md) in the header; click flips `data-theme` dark↔light and repaints the whole themed UI (verified body `#0b0a0d`→`#f5f3f7`, header surface `#141217`→`#ffffff`, quiet borders both themes). (2) Persistence: `localStorage['ludavia-theme-mode']` written on change; reload keeps mode (light→light, dark→dark verified). (3) First visit defaults to dark in a fresh context. (4) No server-render browser access: mode state lifted into `AppProviders` via `useSyncExternalStore` (server snapshot 'dark'); the new React `react-hooks/set-state-in-effect` lint rule forced this pattern over a mount effect; zero hydration warnings and zero console/page errors in dev log and browser. (5) Header: sticky `.app-header` (surface bg, quiet border-bottom, `min-height: var(--spacing-11)`, max-width 1120 inner) with `BrandLogo` text wordmark (temporary, Stage 5 replaces) + toggle; renders at 390px (no horizontal overflow, header 49px) and 1280px. (6) Keyboard: Tab reaches the switch first; focused switch shows Astryx accent focus ring `outline: 2px solid rgb(78,29,142)` (verified computed style; ring is on `.astryx-switch`, track/input internals are styled by the library); Space toggles. (7) No layout shift on toggle; header height constant. (8) `npm run lint`, `npm run typecheck`, `npm run build` all pass; `astryx doctor` 6 passed / 0 failures. Note: Astryx md switch track is 40×24px (library standard control height; no larger Switch size exists — left at library default rather than hacking component internals). Header is in the root layout so splash also shows logo+toggle (exactly what the stage permits for splash).
 
 ---
 
