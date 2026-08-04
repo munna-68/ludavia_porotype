@@ -216,11 +216,13 @@ Completed: 2026-08-05 — Stage 0 verified: (1) repo root confirmed at `/Users/m
 - [ ] `IMPLEMENTATION_PLAN.md` still present.
 - [ ] No Tailwind or competing component library was added.
 
-**Status: NOT STARTED**
+**Status: COMPLETED**
 
 **Model Tier: Low**
 
 **Verification Notes:** Not verified.
+
+Completed: 2026-08-05 — Stage 1 verified: (1) `npm install` succeeds with zero vulnerabilities; scaffold is Next.js 16.3.0 / React 19.2.8 / React-DOM 19.2.8, npm-based, no Tailwind (create-next-app 16.3.0 has no `--no-tailwind` flag; used its default prompt behavior in a temp dir — no Tailwind config or dependency was generated), no other UI library. (2) `npm run dev` serves `http://localhost:3000` with `GET / 200` showing `<h1>LudaVia</h1>` + "Prototype scaffold"; verified via curl. (3) `npm run lint` clean. (4) `npm run typecheck` clean — NOTE: `tsc --noEmit` fails on a fresh tree before the first `next build`/`next dev` because `LayoutProps` is a route-aware global generated into `.next/types` (documented in next/dist/docs/01-app/03-api-reference/03-file-conventions/layout.md); run build or dev once first. (5) `npm run build` clean, 4 static pages (/, /_not-found), Turbopack. (6) App Router + `src/` structure in place; `tsconfig.json` uses `moduleResolution: "bundler"` and `@/*` alias. (7) `IMPLEMENTATION_PLAN.md` still present at repo root. (8) Added `typecheck` script (`tsc --noEmit`); package renamed `ludavia-investor-prototype`; README rewritten (Node 24 prerequisite, install/dev/build, plan pointer). (9) Node: used `node@24` LTS (v24.19.0) via `PATH="/opt/homebrew/opt/node@24/bin:$PATH"` — this PATH override is required for all future npm/node commands; recorded in README. Working tree runnable: `npm run dev` works.
 
 ---
 
