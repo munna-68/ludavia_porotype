@@ -27,3 +27,14 @@ body {
   margin-inline: auto;
   min-height: var(--spacing-11);
 }
+
+.brand-logo {
+  width: calc(var(--spacing-11) * 2);
+  height: var(--spacing-11);
+  flex: 0 0 auto;
+  display: block;
+  object-fit: contain;
+  padding: var(--spacing-1);
+  background: var(--color-text-primary);
+  border-radius: var(--radius-sm);
+}

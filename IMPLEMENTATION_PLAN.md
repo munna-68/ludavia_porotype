@@ -398,11 +398,11 @@ Completed: 2026-08-05 — Stage 2 verified: (1) Installed `@astryxdesign/core@0.
 - [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**
+**Status: BLOCKED**
 
 **Model Tier: Low**
 
-**Verification Notes:** Re-checked at Stage 0 execution on 2026-08-05: still no logo assets in the repository — no `public/` directory exists and no image/asset files of any kind are present. Exact filenames and light/dark-background intent remain unknown and must be recorded here before this stage is marked complete. Re-check again before executing this stage.
+**Verification Notes:** Re-checked on 2026-08-05: supplied asset `public/LudaVia_Purple_Logo_Vector (1).svg` is present and was inspected/rendered. It is a transparent purple `#2d005b` LudaVia wordmark/mark with a `1024 x 625` aspect ratio; no separate approved light-background and dark-background variants or asset notes were supplied. Integrated unchanged in the header using an explicit aspect-ratio-preserving image treatment with a compact warm-text backing so the purple mark remains legible without recoloring or editing the SVG. Stage remains BLOCKED until the second approved background variant and its intended background are supplied. `npm run lint`, `npm run typecheck`, and `npm run build` still need to be run before unblocking.
 
 ---
 
@@ -466,11 +466,11 @@ Completed: 2026-08-05 — Stage 2 verified: (1) Installed `@astryxdesign/core@0.
 - [ ] No actual key or `NEXT_PUBLIC_GEMINI_API_KEY` exists in tracked files.
 - [ ] `npm run lint`, `npm run typecheck`, and `npm run build` succeed.
 
-**Status: NOT STARTED**
+**Status: COMPLETED**
 
 **Model Tier: Medium**
 
-**Verification Notes:** Not verified.
+**Verification Notes:** Completed: 2026-08-05 — Stage 6 verified: installed `zod`, `server-only`, and `client-only` with zero vulnerabilities; added shared serializable types, centralized form options, Zod normalization with field-level errors and length limits, versioned `sessionStorage` helpers with malformed-data cleanup, and `src/server/gemini-config.ts` protected by `server-only` using `GEMINI_API_KEY` plus configurable `GEMINI_MODEL` (`gemini-2.5-flash` fallback). No API key or `NEXT_PUBLIC_GEMINI_API_KEY` is tracked, and no client module imports the server config. Stage 5 remains blocked for the missing approved logo variant; Stage 6 proceeded under its documented independent-work exception. `PATH="/opt/homebrew/opt/node@24/bin:$PATH" npm run lint`, `npm run typecheck`, `npm run build`, and `npm run astryx -- doctor` all pass (doctor: 6 passed, 0 warnings, 0 failures).
 
 ---
 
