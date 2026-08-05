@@ -38,3 +38,9 @@ MORE CLI:
   swizzle <Name>     eject component source for deep customization
   upgrade --apply    run after any @astryxdesign/core bump
 <!-- ASTRYX:END -->
+
+## LudaVia UI Contract
+
+- Before changing or adding frontend UI, read `design.md`. It is the cross-screen visual source of truth.
+- Treat the existing form journey as the reference implementation. Review/results screens must reuse its header, typography, spacing, controls, and action patterns rather than inventing route-specific styles.
+- Before finishing UI work, follow the visual QA checklist in `design.md` and verify responsive gutters, heading metrics, control alignment, focus states, and horizontal overflow.

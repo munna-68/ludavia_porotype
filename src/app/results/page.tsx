@@ -1,5 +1,5 @@
-import { ResultsShell } from '@/components/results/results-shell';
+import { ResultsSessionGate } from '@/components/results/results-session-gate';
 
 export default function ResultsPage() {
-  return <ResultsShell />;
+  return <ResultsSessionGate />;
 }

@@ -702,11 +702,11 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
 - [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**
+**Status: COMPLETED**
 
 **Model Tier: Medium**
 
-**Verification Notes:** Not verified.
+**Verification Notes:** Completed: 2026-08-06 — Added the server-safe `/results` entry and browser-only `ResultsSessionGate`. The gate renders a shaped loading shell, loads and validates the same-tab session after mount, redirects a cold tab to `/form`, and passes the serializable profile into `ResultsShell`; the existing journey-aligned snapshot review and illustrative opportunity reveal remain intact per the updated `design.md` contract rather than introducing a dashboard-style results grid. Verified in Chromium at 1280px and mobile layout width, with no horizontal overflow, session refresh recovery, edit-detail navigation with prefilled form values, personalized opportunity/connection copy, cold-tab redirect, and dark/light theme rendering. `npm run lint`, `npm run typecheck`, `npm run build`, and `git diff --check` pass.
 
 ---
 
@@ -735,11 +735,11 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
 - [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**
+**Status: COMPLETED**
 
 **Model Tier: Medium**
 
-**Verification Notes:** Not verified.
+**Verification Notes:** Completed: 2026-08-06 — Added reusable `OpportunityCard` and `ConnectionCard` components using Astryx `Card`, `Avatar`, `Token`, `Button`, and `Dialog`; both cards personalize copy from normalized session data, expose honest illustrative labels, and contain no fake metrics or unresolved tokens. The opportunity action opens an in-app details dialog; the connection action shows an explicit prototype-only notice without sending or storing an introduction. Verified in Chromium at 1280px dark and 390px dark/light with desktop side-by-side cards, mobile stacking, no horizontal overflow, keyboard-accessible actions, and correct personalized copy. `npm run lint`, `npm run typecheck`, `npm run build`, and `git diff --check` pass; mobile Lighthouse snapshot reports Accessibility 100, Best Practices 100, SEO 100, and Agentic Browsing 100. Stage 5 remains blocked independently on the missing approved logo variant.
 
 ---
 

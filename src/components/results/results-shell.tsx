@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
@@ -14,11 +14,9 @@ import {
   UserRound,
 } from 'lucide-react';
 import { DotPattern } from '@/components/magicui/dot-pattern';
-import { sampleConnection } from '@/data/sample-connection';
-import { sampleOpportunity } from '@/data/sample-opportunity';
+import { ConnectionCard } from '@/components/results/connection-card';
+import { OpportunityCard } from '@/components/results/opportunity-card';
 import { labelForField } from '@/data/form-options';
-import { loadBusinessNeeds } from '@/lib/session-store';
-import { personalize } from '@/lib/personalize';
 import type { BusinessNeedsInput } from '@/lib/types';
 
 const REVIEW_ROWS = [
@@ -30,43 +28,9 @@ const REVIEW_ROWS = [
   { field: 'mainGoal', label: 'Main goal', icon: Flag },
 ] as const;
 
-export function ResultsShell() {
+export function ResultsShell({ values }: { values: BusinessNeedsInput }) {
   const router = useRouter();
-  const [values, setValues] = useState<BusinessNeedsInput | null>(null);
-  const [ready, setReady] = useState(false);
   const [showOpportunities, setShowOpportunities] = useState(false);
-
-  useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
-      const saved = loadBusinessNeeds();
-      if (!saved) {
-        router.replace('/form');
-        return;
-      }
-      setValues(saved);
-      setReady(true);
-    });
-
-    return () => window.cancelAnimationFrame(frame);
-  }, [router]);
-
-  if (!ready || !values) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-ink px-6 text-white">
-        <div className="w-full max-w-md space-y-4" aria-label="Loading your snapshot" role="status">
-          <div className="h-3 w-24 animate-pulse rounded-full bg-white/10" />
-          <div className="h-14 w-4/5 animate-pulse rounded-2xl bg-white/10" />
-          <div className="h-36 animate-pulse rounded-3xl bg-white/5" />
-        </div>
-      </main>
-    );
-  }
-
-  const opportunityScope = personalize(sampleOpportunity.scope, values);
-  const opportunityFit = personalize(sampleOpportunity.whyItFits, values);
-  const connectionLocation = personalize(sampleConnection.location, values);
-  const connectionContext = personalize(sampleConnection.mutualContext, values);
-  const connectionWhy = personalize(sampleConnection.whyConnect, values);
 
   return (
     <main className="snapshot-page relative min-h-[100dvh] overflow-hidden bg-ink text-warm">
@@ -131,21 +95,8 @@ export function ResultsShell() {
 
           {showOpportunities ? (
             <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="opportunity-reveal mt-6 grid gap-3 sm:grid-cols-2" aria-live="polite">
-              <article className="rounded-2xl border border-violet-bright/25 bg-violet-soft p-5 sm:p-6">
-                <p className="text-violet-gradient text-[0.65rem] font-semibold uppercase tracking-[0.18em]">{sampleOpportunity.illustrativeLabel}</p>
-                <h2 className="mt-4 font-sans text-2xl font-semibold text-white">{sampleOpportunity.title}</h2>
-                <p className="mt-2 text-sm font-medium text-white/70">{sampleOpportunity.organization}</p>
-                <p className="mt-4 text-sm leading-6 text-white/60">{opportunityScope}</p>
-                <p className="mt-4 border-t border-white/10 pt-4 text-sm leading-6 text-white/70">{opportunityFit}</p>
-              </article>
-              <article className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 sm:p-6">
-                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-white/45">{sampleConnection.illustrativeLabel}</p>
-                <h2 className="mt-4 font-sans text-2xl font-semibold text-white">{sampleConnection.name}</h2>
-                <p className="mt-2 text-sm font-medium text-white/70">{sampleConnection.role}</p>
-                <p className="mt-1 text-sm text-white/45">{sampleConnection.organization} · {connectionLocation}</p>
-                <p className="mt-4 text-sm leading-6 text-white/60">{connectionContext}</p>
-                <p className="mt-4 border-t border-white/10 pt-4 text-sm leading-6 text-white/70">{connectionWhy}</p>
-              </article>
+              <OpportunityCard values={values} />
+              <ConnectionCard values={values} />
             </motion.section>
           ) : null}
         </div>
