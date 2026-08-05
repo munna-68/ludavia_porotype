@@ -74,11 +74,11 @@ const STEP_FIELDS: ReadonlyArray<ReadonlyArray<FieldName>> = [
 ];
 
 const STEP_META = [
-  { eyebrow: 'Start', lead: 'What should we', highlightLead: 'call', highlight: 'your business?', hint: 'A name gives the snapshot somewhere to begin.' },
-  { eyebrow: 'Model', lead: 'What kind of', highlightLead: undefined, highlight: 'business is it?', hint: 'Choose the closest fit. Nothing is permanent.' },
-  { eyebrow: 'Market', lead: 'Where do you', highlightLead: undefined, highlight: 'operate?', hint: 'Tell us your sector and where you call home.' },
-  { eyebrow: 'Stage', lead: 'Where are you in', highlightLead: undefined, highlight: 'the journey?', hint: 'Meet the business where it is today.' },
-  { eyebrow: 'Focus', lead: 'What would', highlightLead: undefined, highlight: 'move it forward?', hint: 'Pick the goal and kind of support that matters most.' },
+  { eyebrow: 'Start', lead: 'What should we', highlightLead: 'call', highlight: 'your business?', highlightTail: undefined, hint: 'A name gives the snapshot somewhere to begin.' },
+  { eyebrow: 'Model', lead: 'What kind of', highlightLead: undefined, highlight: 'business', highlightTail: 'is it?', hint: 'Choose the closest fit. Nothing is permanent.' },
+  { eyebrow: 'Market', lead: 'Where do you', highlightLead: undefined, highlight: 'operate?', highlightTail: undefined, hint: 'Tell us your sector and where you call home.' },
+  { eyebrow: 'Stage', lead: 'Where are you in', highlightLead: undefined, highlight: 'the journey?', highlightTail: undefined, hint: 'Meet the business where it is today.' },
+  { eyebrow: 'Focus', lead: 'What would', highlightLead: undefined, highlight: 'move it forward?', highlightTail: undefined, hint: 'Pick the goal and kind of support that matters most.' },
 ] as const;
 
 const businessTypeIcons: Record<string, LucideIcon> = {
@@ -281,9 +281,11 @@ export function BusinessNeedsForm({ initialStep = 0 }: { initialStep?: number })
       <div className="noise-layer" />
       <DotPattern width={20} height={20} cx={1} cy={1} cr={0.75} className="form-dot-pattern" />
       <section className="form-shell relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[72rem] flex-col overflow-hidden">
-        <div className="form-globe-stage" aria-hidden="true">
-          <Globe config={FORM_GLOBE_CONFIG} className="form-globe pointer-events-none left-1/2 z-0 -translate-x-1/2" />
-        </div>
+        {step === 0 ? (
+          <div className="form-globe-stage" aria-hidden="true">
+            <Globe config={FORM_GLOBE_CONFIG} className="form-globe pointer-events-none left-1/2 z-0 -translate-x-1/2" />
+          </div>
+        ) : null}
 
         <header className="form-header relative z-20 flex items-center gap-4 px-5 pb-5 pt-5 sm:gap-7 sm:px-9 sm:pb-7 sm:pt-8">
           <button type="button" className="form-back icon-button inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.025] text-white transition hover:border-white/30 hover:bg-white/[0.08]" aria-label={step === 0 ? 'Back to welcome page' : 'Go to previous step'} onClick={handleBack}>
@@ -313,11 +315,11 @@ export function BusinessNeedsForm({ initialStep = 0 }: { initialStep?: number })
         </header>
 
         <form className="form-body flex min-h-0 flex-1 flex-col" onSubmit={(event) => { event.preventDefault(); handleContinue(); }}>
-          <motion.div key={step} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="form-step-content flex flex-1 flex-col px-5 pb-8 sm:px-9 sm:pb-9">
+          <motion.div key={step} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className={cn('form-step-content flex flex-1 flex-col px-5 pb-8 sm:px-9 sm:pb-9', step > 0 && 'form-step-content--detail')}>
             <StepHeading id={headingId} meta={meta} />
 
             <fieldset className="min-w-0 flex-1" aria-labelledby={headingId}>
-              <legend className="sr-only">{meta.lead} {meta.highlightLead ? `${meta.highlightLead} ` : ''}{meta.highlight}</legend>
+              <legend className="sr-only">{meta.lead} {meta.highlightLead ? `${meta.highlightLead} ` : ''}{meta.highlight}{meta.highlightTail ? ` ${meta.highlightTail}` : ''}</legend>
               {step === 0 ? (
                 <div data-field="businessName">
                   <TextField
@@ -447,6 +449,7 @@ function StepHeading({ id, meta }: { id: string; meta: (typeof STEP_META)[number
         <span className="onboarding-heading__line onboarding-heading__line--answer">
           {meta.highlightLead ? <span className="onboarding-heading__plain"><TextAnimate>{meta.highlightLead}</TextAnimate></span> : null}
           <span className="onboarding-heading__accent"><TextAnimate>{meta.highlight}</TextAnimate></span>
+          {meta.highlightTail ? <span className="onboarding-heading__plain"><TextAnimate>{meta.highlightTail}</TextAnimate></span> : null}
         </span>
       </h1>
       <p className="onboarding-hint">{meta.hint}</p>
@@ -492,7 +495,7 @@ function ChoiceGrid({ field, ariaLabel, options, value, icons, error, onSelect }
                 <span className="block text-[0.98rem] font-semibold text-white">{option.label}</span>
                 {option.description ? <span className="mt-1 block text-sm leading-5 text-white/55">{option.description}</span> : null}
               </span>
-              {selected ? <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-violet-bright shadow-[0_0_14px_rgba(164,109,255,0.75)]" aria-hidden="true" /> : null}
+              {selected ? <span className="choice-selected-indicator h-2.5 w-2.5 shrink-0 rounded-full bg-violet-bright shadow-[0_0_14px_rgba(164,109,255,0.75)]" aria-hidden="true" /> : null}
             </button>
           );
         })}

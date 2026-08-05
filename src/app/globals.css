@@ -403,6 +403,63 @@ select {
   padding: clamp(15rem, 34vh, 22rem) clamp(1.25rem, 6vw, 4rem) 2rem;
 }
 
+.form-step-content--detail {
+  min-height: 0;
+  overflow-y: auto;
+  padding-top: clamp(2.75rem, 6vh, 4.5rem);
+}
+
+.form-step-content--detail .onboarding-heading h1 {
+  font-family: var(--font-body);
+  font-size: clamp(2.75rem, 9vw, 4.75rem);
+  font-weight: 600;
+  letter-spacing: -0.06em;
+  line-height: 0.98;
+}
+
+.form-step-content--detail fieldset {
+  margin-top: 1.8rem;
+}
+
+.form-step-content--detail [role="radiogroup"] {
+  gap: 0.5rem;
+}
+
+.form-step-content--detail .choice-card {
+  min-height: 4.75rem;
+  gap: 1.25rem;
+  border-color: rgba(255, 255, 255, 0.16);
+  border-radius: 0.95rem;
+  background: rgba(255, 255, 255, 0.018);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.form-step-content--detail .choice-card:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateY(-0.0625rem);
+}
+
+.form-step-content--detail .choice-card[data-selected="true"] {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.025);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.form-step-content--detail .choice-icon,
+.form-step-content--detail .choice-selected-indicator {
+  display: none;
+}
+
+.form-step-content--detail .choice-card[data-selected="true"] .radio-dot {
+  border-color: var(--violet-bright);
+  background: transparent;
+  box-shadow:
+    inset 0 0 0 0.2rem var(--form-bg),
+    0 0 0 0.1rem rgba(164, 109, 255, 0.65),
+    0 0 1rem rgba(164, 109, 255, 0.3);
+}
+
 .form-step-content .onboarding-action {
   min-height: 4.25rem;
   font-size: 1rem;
@@ -623,7 +680,7 @@ select {
   margin: 0;
   color: var(--form-text);
   font-family: var(--font-body);
-  font-weight: 500;
+  font-weight: 600;
   font-size: clamp(2.25rem, 7.5vw, 4.75rem);
   letter-spacing: -0.045em;
   line-height: 0.98;
