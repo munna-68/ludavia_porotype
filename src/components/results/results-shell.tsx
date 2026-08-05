@@ -91,9 +91,9 @@ export function ResultsShell() {
 
         <div className="flex flex-1 flex-col px-5 pb-8 sm:px-9 sm:pb-9">
           <div className="mb-8 sm:mb-10">
-            <p className="mb-4 text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-violet-bright">Review</p>
+            <p className="text-violet-gradient mb-4 text-[0.68rem] font-semibold uppercase tracking-[0.28em]">Review</p>
             <h1 className="max-w-[13ch] font-display text-[clamp(3rem,8vw,5rem)] font-normal leading-[0.92] tracking-[-0.06em] text-white">
-              Check your <span className="text-violet-bright">snapshot.</span>
+              Check your <span className="text-violet-gradient">snapshot.</span>
             </h1>
             <p className="mt-6 max-w-[38ch] text-base leading-7 text-white/60 sm:text-lg">One last look before we map the next step.</p>
           </div>
@@ -112,7 +112,7 @@ export function ResultsShell() {
                   <span className="text-[0.63rem] font-semibold uppercase tracking-[0.16em] text-white/45 sm:text-xs">{label}</span>
                   <span className="min-w-0 truncate text-sm font-medium text-white sm:text-base">{display}</span>
                   <button type="button" className="snapshot-edit inline-flex items-center gap-1 text-xs font-semibold sm:text-sm" onClick={() => router.push(`/form?step=${step + 1}`)}>
-                    <span className="hidden sm:inline">Edit</span>
+                    <span className="text-violet-gradient hidden sm:inline">Edit</span>
                     <Pencil className="h-3.5 w-3.5 sm:hidden" aria-label="Edit" />
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </button>
@@ -133,7 +133,7 @@ export function ResultsShell() {
           {showOpportunities ? (
             <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="opportunity-reveal mt-6 grid gap-3 sm:grid-cols-2" aria-live="polite">
               <article className="rounded-2xl border border-violet-bright/25 bg-violet-soft p-5 sm:p-6">
-                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-violet-bright">{sampleOpportunity.illustrativeLabel}</p>
+                <p className="text-violet-gradient text-[0.65rem] font-semibold uppercase tracking-[0.18em]">{sampleOpportunity.illustrativeLabel}</p>
                 <h2 className="mt-4 font-display text-2xl text-white">{sampleOpportunity.title}</h2>
                 <p className="mt-2 text-sm font-medium text-white/70">{sampleOpportunity.organization}</p>
                 <p className="mt-4 text-sm leading-6 text-white/60">{opportunityScope}</p>

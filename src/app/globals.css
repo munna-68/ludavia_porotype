@@ -1,3 +1,6 @@
+@import "@astryxdesign/core/reset.css";
+@import "@astryxdesign/core/astryx.css";
+@import "../lib/ludavia.css";
 @import "tailwindcss";
 
 @theme inline {
@@ -28,6 +31,8 @@
   --violet: #4e1d8e;
   --violet-bright: #a46dff;
   --violet-soft: rgba(164, 109, 255, 0.14);
+  --violet-gradient-start: var(--violet-bright);
+  --violet-gradient-end: var(--violet);
   --orange: #f08226;
   --splash-page-bg: #080809;
   --splash-frame-bg: #0a0a0d;
@@ -55,6 +60,8 @@ html.light {
   --violet: #4e1d8e;
   --violet-bright: #6d3bc3;
   --violet-soft: rgba(78, 29, 142, 0.1);
+  --violet-gradient-start: var(--splash-accent-top);
+  --violet-gradient-end: var(--violet);
   --splash-page-bg: #f0edf3;
   --splash-frame-bg: #faf9fb;
   --splash-frame-line: rgba(29, 24, 33, 0.14);
@@ -421,7 +428,7 @@ select {
   margin-top: 1.8rem;
 }
 
-.form-step-content--detail [role="radiogroup"] {
+.form-step-content--detail [role="group"] {
   gap: 0.5rem;
 }
 
@@ -431,33 +438,12 @@ select {
   border-color: rgba(255, 255, 255, 0.16);
   border-radius: 0.95rem;
   background: rgba(255, 255, 255, 0.018);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
 }
 
 .form-step-content--detail .choice-card:hover {
   border-color: rgba(255, 255, 255, 0.28);
   background: rgba(255, 255, 255, 0.04);
   transform: translateY(-0.0625rem);
-}
-
-.form-step-content--detail .choice-card[data-selected="true"] {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.025);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-.form-step-content--detail .choice-icon,
-.form-step-content--detail .choice-selected-indicator {
-  display: none;
-}
-
-.form-step-content--detail .choice-card[data-selected="true"] .radio-dot {
-  border-color: var(--violet-bright);
-  background: transparent;
-  box-shadow:
-    inset 0 0 0 0.2rem var(--form-bg),
-    0 0 0 0.1rem rgba(164, 109, 255, 0.65),
-    0 0 1rem rgba(164, 109, 255, 0.3);
 }
 
 .form-step-content .onboarding-action {
@@ -743,10 +729,6 @@ select {
   border-color: var(--violet-bright);
   background: rgba(255, 255, 255, 0.025);
   box-shadow: 0 0 0 1px rgba(164, 109, 255, 0.12);
-}
-
-.onboarding-panel--preview .choice-card[data-selected="true"] .radio-dot {
-  background: transparent;
 }
 
 .onboarding-action-wrap {
@@ -1058,6 +1040,7 @@ html.light .onboarding-back {
 }
 
 .choice-card {
+  --color-accent: var(--violet-bright);
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.025);
   transition:
@@ -1073,18 +1056,6 @@ html.light .onboarding-back {
   transform: translateX(2px);
 }
 
-.choice-card[data-selected="true"] {
-  border-color: var(--violet-bright);
-  background: linear-gradient(
-    105deg,
-    rgba(78, 29, 142, 0.34),
-    rgba(164, 109, 255, 0.08)
-  );
-  box-shadow:
-    0 0 0 1px rgba(164, 109, 255, 0.12),
-    0 18px 42px rgba(78, 29, 142, 0.18);
-}
-
 .choice-card:focus-visible,
 .icon-button:focus-visible,
 .theme-toggle:focus-visible,
@@ -1094,24 +1065,11 @@ html.light .onboarding-back {
   outline-offset: 3px;
 }
 
-.radio-dot {
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  transition:
-    border-color 180ms ease,
-    background-color 180ms ease,
-    box-shadow 180ms ease;
-}
-
-.choice-card[data-selected="true"] .radio-dot {
-  border-color: var(--violet-bright);
-  background: var(--violet-bright);
-  box-shadow:
-    inset 0 0 0 4px var(--panel),
-    0 0 18px rgba(164, 109, 255, 0.5);
-}
-
 .choice-card[data-selected="true"] .choice-icon {
+  border-color: rgba(164, 109, 255, 0.48);
+  background: rgba(164, 109, 255, 0.12);
   color: var(--violet-bright);
+  box-shadow: 0 0 1.1rem rgba(164, 109, 255, 0.28);
 }
 
 .progress-segment {
@@ -1192,6 +1150,18 @@ html.light .onboarding-back {
   animation: reveal-up 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+.text-violet-gradient {
+  background: linear-gradient(
+    112deg,
+    var(--violet-gradient-start) 0%,
+    var(--violet-gradient-end) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
 html.light [class~="text-white"] {
   color: var(--warm) !important;
 }
@@ -1254,7 +1224,6 @@ html.light .choice-card:hover {
   background: rgba(20, 18, 24, 0.05);
 }
 
-html.light .radio-dot,
 html.light .progress-segment,
 html.light .journey-track {
   border-color: rgba(20, 18, 24, 0.35);

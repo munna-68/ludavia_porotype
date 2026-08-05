@@ -3,6 +3,7 @@
 import { useEffect, useId, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { SelectableCard } from '@astryxdesign/core/SelectableCard';
 import type { LucideIcon } from 'lucide-react';
 import {
   AlertCircle,
@@ -443,12 +444,12 @@ export function BusinessNeedsForm({ initialStep = 0 }: { initialStep?: number })
 function StepHeading({ id, meta }: { id: string; meta: (typeof STEP_META)[number] }) {
   return (
     <div className="onboarding-heading">
-      <p className="onboarding-eyebrow">{meta.eyebrow}</p>
+      <p className="onboarding-eyebrow text-violet-gradient">{meta.eyebrow}</p>
       <h1 id={id}>
         <span className="onboarding-heading__line"><TextAnimate>{meta.lead}</TextAnimate></span>
         <span className="onboarding-heading__line onboarding-heading__line--answer">
           {meta.highlightLead ? <span className="onboarding-heading__plain"><TextAnimate>{meta.highlightLead}</TextAnimate></span> : null}
-          <span className="onboarding-heading__accent"><TextAnimate>{meta.highlight}</TextAnimate></span>
+          <span className="onboarding-heading__accent"><TextAnimate className="text-violet-gradient">{meta.highlight}</TextAnimate></span>
           {meta.highlightTail ? <span className="onboarding-heading__plain"><TextAnimate>{meta.highlightTail}</TextAnimate></span> : null}
         </span>
       </h1>
@@ -469,23 +470,24 @@ type ChoiceGridProps = {
 
 function ChoiceGrid({ field, ariaLabel, options, value, icons, error, onSelect }: ChoiceGridProps) {
   return (
-    <div data-field={field}>
-      <div className="grid gap-2.5" role="radiogroup" aria-label={ariaLabel}>
+    <div data-field={field} data-astryx-theme="ludavia">
+      <div className="grid gap-2.5" role="group" aria-label={ariaLabel}>
         {options.map((option) => {
           const selected = option.value === value;
           const Icon = icons[option.value];
 
           return (
-            <button
-              type="button"
+            <SelectableCard
               key={option.value}
               className="choice-card group flex min-h-[4.75rem] w-full items-center gap-4 rounded-2xl px-4 py-3.5 text-left sm:px-5"
-              data-selected={selected}
-              role="radio"
-              aria-checked={selected}
-              onClick={() => onSelect(option.value)}
+              label={option.description ? `${option.label}. ${option.description}` : option.label}
+              isSelected={selected}
+              onChange={(nextSelected) => {
+                if (nextSelected) onSelect(option.value);
+              }}
+              padding={0}
+              variant="transparent"
             >
-              <span className="radio-dot inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full" aria-hidden="true" />
               {Icon ? (
                 <span className="choice-icon inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/[0.035] text-white/60 transition-colors">
                   <Icon className="h-5 w-5" strokeWidth={1.5} aria-hidden="true" />
@@ -495,8 +497,7 @@ function ChoiceGrid({ field, ariaLabel, options, value, icons, error, onSelect }
                 <span className="block text-[0.98rem] font-semibold text-white">{option.label}</span>
                 {option.description ? <span className="mt-1 block text-sm leading-5 text-white/55">{option.description}</span> : null}
               </span>
-              {selected ? <span className="choice-selected-indicator h-2.5 w-2.5 shrink-0 rounded-full bg-violet-bright shadow-[0_0_14px_rgba(164,109,255,0.75)]" aria-hidden="true" /> : null}
-            </button>
+            </SelectableCard>
           );
         })}
       </div>
