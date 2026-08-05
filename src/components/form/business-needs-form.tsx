@@ -455,6 +455,192 @@ export function BusinessNeedsForm({ initialStep = 0 }: { initialStep?: number })
   );
 }
 
+function StepHeading({ id, meta }: { id: string; meta: (typeof STEP_META)[number] }) {
+  return (
+    <div className="onboarding-heading">
+      <p className="onboarding-eyebrow">{meta.eyebrow}</p>
+      <h1 id={id}>
+        <TextAnimate>{meta.lead}</TextAnimate>
+        <br />
+        <span>{meta.highlight}</span>
+      </h1>
+      <p className="onboarding-hint">{meta.hint}</p>
+    </div>
+  );
+}
+
+function OnboardingHeader({
+  panelStep,
+  onBack,
+  onJump,
+  showTheme = false,
+}: {
+  panelStep: number;
+  onBack: () => void;
+  onJump: (index: number) => void;
+  showTheme?: boolean;
+}) {
+  const segmentLimit = (panelStep + 1) * (PROGRESS_SEGMENTS / TOTAL_STEPS);
+
+  return (
+    <header className="onboarding-panel__header">
+      <button type="button" className="onboarding-back" aria-label={panelStep === 0 ? 'Back to welcome page' : 'Go to previous step'} onClick={onBack}>
+        <ArrowLeft aria-hidden="true" />
+      </button>
+      <div className="onboarding-segments" aria-label={`Step ${panelStep + 1} of ${TOTAL_STEPS}`}>
+        {Array.from({ length: PROGRESS_SEGMENTS }, (_, index) => (
+          <button
+            type="button"
+            key={index}
+            className="onboarding-segment"
+            data-complete={index < segmentLimit}
+            aria-label={`Go to step ${Math.floor(index / 2) + 1}`}
+            onClick={() => onJump(Math.floor(index / 2))}
+          />
+        ))}
+      </div>
+      <p className="onboarding-step-count">Step {panelStep + 1} <span>of</span> {TOTAL_STEPS}</p>
+      {showTheme ? <ThemeToggle /> : null}
+    </header>
+  );
+}
+
+function PanelAction({ label, disabled, isLoading }: { label: string; disabled?: boolean; isLoading?: boolean }) {
+  return (
+    <div className="onboarding-action-wrap">
+      <button type="submit" className="onboarding-action" disabled={disabled}>
+        <span>{label}</span>
+        <span className="onboarding-action__arrow" aria-hidden="true">
+          <ArrowRight />
+        </span>
+      </button>
+      {isLoading ? <span className="sr-only">Saving your business snapshot</span> : null}
+    </div>
+  );
+}
+
+function PanelFooter({ progress }: { progress: number }) {
+  return (
+    <footer className="onboarding-panel__footer">
+      <div className="onboarding-panel__footer-meta">
+        <span>Journey</span>
+        <span>{progress}%</span>
+      </div>
+      <div className="journey-track" aria-label={`Journey progress: ${progress}%`} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}>
+        <div className="journey-track__fill" style={{ width: `${progress}%` }} />
+      </div>
+    </footer>
+  );
+}
+
+function StepFields({
+  step,
+  values,
+  errors,
+  preview,
+  onUpdate,
+}: {
+  step: number;
+  values: FormValues;
+  errors: Partial<Record<FieldName, string>>;
+  preview: boolean;
+  onUpdate: <K extends keyof FormValues>(field: K, value: FormValues[K]) => void;
+}) {
+  if (step === 0) {
+    return null;
+  }
+
+  if (step === 1) {
+    return (
+      <ChoiceGrid
+        field="businessType"
+        ariaLabel="Business type"
+        options={businessTypeOptions}
+        value={preview ? 'other' : values.businessType}
+        icons={businessTypeIcons}
+        error={errors.businessType}
+        onSelect={(value) => onUpdate('businessType', value)}
+      />
+    );
+  }
+
+  if (step === 2) {
+    return (
+      <div className="grid gap-4" data-field="industry-location">
+        <SelectField
+          id="industry"
+          label="Sector"
+          placeholder="Choose a sector"
+          options={industryOptions}
+          value={values.industry}
+          icon={Building2}
+          error={errors.industry}
+          onChange={(value) => onUpdate('industry', value)}
+        />
+        <div data-field="location">
+          <TextField
+            id="location"
+            label="Location"
+            placeholder="City, region, or country"
+            value={values.location}
+            icon={MapPin}
+            error={errors.location}
+            onChange={(value) => onUpdate('location', value)}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (step === 3) {
+    return (
+      <ChoiceGrid
+        field="stage"
+        ariaLabel="Business stage"
+        options={stageOptions}
+        value={values.stage}
+        icons={stageIcons}
+        error={errors.stage}
+        onSelect={(value) => onUpdate('stage', value as BusinessStage)}
+      />
+    );
+  }
+
+  return (
+    <div className="grid gap-5">
+      <ChoiceGrid
+        field="mainGoal"
+        ariaLabel="Main goal"
+        options={mainGoalOptions}
+        value={values.mainGoal}
+        icons={mainGoalIcons}
+        error={errors.mainGoal}
+        onSelect={(value) => onUpdate('mainGoal', value)}
+      />
+      <div data-field="helpNeeded">
+        <SelectField
+          id="helpNeeded"
+          label="Where do you need help?"
+          placeholder="Choose one"
+          options={helpNeededOptions}
+          value={values.helpNeeded}
+          icon={CircleHelp}
+          error={errors.helpNeeded}
+          onChange={(value) => onUpdate('helpNeeded', value)}
+        />
+      </div>
+      <TextAreaField
+        id="description"
+        label="Anything else? (optional)"
+        placeholder="A little more context can sharpen the snapshot."
+        value={values.description}
+        maxLength={500}
+        onChange={(value) => onUpdate('description', value)}
+      />
+    </div>
+  );
+}
+
 type ChoiceGridProps = {
   field: FieldName;
   ariaLabel: string;

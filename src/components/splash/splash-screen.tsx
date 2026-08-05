@@ -16,7 +16,7 @@ export function SplashScreen() {
       <div className="dot-layer" />
 
       <section className="splash-frame relative isolate mx-auto flex w-full flex-col overflow-hidden rounded-[1.75rem] border border-white/15 sm:rounded-[2rem]">
-        <AppHeader minimal />
+        <AppHeader />
 
         <div className="splash-light pointer-events-none absolute inset-x-0 top-0 h-80" />
         <div className="splash-content relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center px-6 text-center sm:px-10">

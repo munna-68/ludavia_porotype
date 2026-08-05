@@ -17,13 +17,13 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      className="icon-button inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/[0.035] text-white transition hover:border-white/35 hover:bg-white/[0.08]"
+      className="icon-button inline-flex h-12 w-12 items-center justify-center rounded-full text-white/80 transition hover:bg-white/[0.07] hover:text-white"
       aria-label={`Switch to ${nextMode} mode`}
       title={`Switch to ${nextMode} mode`}
       onClick={() => setTheme(nextMode)}
     >
-      <Sun className="h-4 w-4 dark:hidden" aria-hidden="true" />
-      <Moon className="hidden h-4 w-4 dark:block" aria-hidden="true" />
+      <Sun className="h-6 w-6 dark:hidden" aria-hidden="true" />
+      <Moon className="hidden h-6 w-6 dark:block" aria-hidden="true" />
     </button>
   );
 }
