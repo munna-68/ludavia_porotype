@@ -1,19 +1,9 @@
-'use client';
-
-import Image from 'next/image';
-import { useThemeMode } from '@/components/providers/app-providers';
+import Link from 'next/link';
 
 export function BrandLogo() {
-  const { mode } = useThemeMode();
-
   return (
-    <Image
-      src="/LudaVia_Purple_Logo_Vector%20(1).svg"
-      alt="LudaVia"
-      width={1024}
-      height={625}
-      priority
-      className={`brand-logo${mode === 'dark' ? ' brand-logo--dark' : ''}`}
-    />
+    <Link href="/" className="inline-flex items-center text-[0.93rem] font-semibold tracking-[0.22em] text-white transition-opacity hover:opacity-75">
+      LUDAVIA
+    </Link>
   );
 }

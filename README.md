@@ -1,6 +1,6 @@
 # LudaVia — Investor Prototype
 
-High-fidelity investor prototype for LudaVia. See `IMPLEMENTATION_PLAN.md` for the full build plan, stage status, and scope.
+High-fidelity investor prototype for LudaVia. The current UI uses Tailwind CSS with local Magic UI-style primitives for the splash, five-step journey, and snapshot review. See `IMPLEMENTATION_PLAN.md` for the original product scope.
 
 ## Prerequisites
 
@@ -24,3 +24,5 @@ npm run typecheck
 npm run build
 npm run start
 ```
+
+Astryx remains installed as a reversible migration dependency, but the active app screens no longer import it.

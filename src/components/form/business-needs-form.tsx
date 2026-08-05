@@ -1,640 +1,575 @@
 'use client';
 
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import type { CSSProperties, ReactElement } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Heading } from '@astryxdesign/core/Heading';
-import { Text } from '@astryxdesign/core/Text';
-import { Button } from '@astryxdesign/core/Button';
-import { Banner } from '@astryxdesign/core/Banner';
-import { TextInput } from '@astryxdesign/core/TextInput';
-import { Selector } from '@astryxdesign/core/Selector';
-import { SelectableCard } from '@astryxdesign/core/SelectableCard';
-import { FieldStatus } from '@astryxdesign/core/FieldStatus';
-import { VStack } from '@astryxdesign/core/VStack';
-import { HStack } from '@astryxdesign/core/HStack';
+import { motion } from 'framer-motion';
+import type { LucideIcon } from 'lucide-react';
+import {
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpRight,
+  Building2,
+  ChevronDown,
+  CircleHelp,
+  DollarSign,
+  Globe2,
+  Handshake,
+  Lightbulb,
+  MapPin,
+  Megaphone,
+  Plus,
+  Square,
+  TrendingUp,
+} from 'lucide-react';
+import { ShimmerButton } from '@/components/magicui/shimmer-button';
+import { TextAnimate } from '@/components/magicui/text-animate';
+import { ThemeToggle } from '@/components/chrome/theme-toggle';
 import { normalizeBusinessNeeds } from '@/lib/business-needs-schema';
 import { loadBusinessNeeds, saveBusinessNeeds } from '@/lib/session-store';
-import type { BusinessNeedsInput, BusinessStage } from '@/lib/types';
-import { GlobeVisual } from '@/components/motion/globe-visual';
 import {
   businessTypeOptions,
   helpNeededOptions,
   industryOptions,
-  labelForField,
   mainGoalOptions,
   stageOptions,
+  type FormOption,
 } from '@/data/form-options';
+import type { BusinessNeedsInput, BusinessStage } from '@/lib/types';
+import { cn } from '@/lib/utils';
 
-type Values = BusinessNeedsInput;
-
-type OptionIconProps = { className?: string };
-
-const iconProps = {
-  viewBox: '0 0 24 24',
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.5,
-  strokeLinecap: 'round' as const,
-  strokeLinejoin: 'round' as const,
-  'aria-hidden': true,
-  focusable: false,
+type FormValues = {
+  businessName: string;
+  businessType: string;
+  industry: string;
+  location: string;
+  stage: BusinessStage | '';
+  mainGoal: string;
+  helpNeeded: string;
+  description: string;
 };
 
-function CubeIcon({ className }: OptionIconProps) {
-  return (
-    <svg className={className} {...iconProps}>
-      <path d="M12 3 3 7.5v9L12 21l9-4.5v-9Z" />
-      <path d="M3 7.5 12 12l9-4.5M12 12v9" />
-    </svg>
-  );
-}
-function BriefcaseIcon({ className }: OptionIconProps) {
-  return (
-    <svg className={className} {...iconProps}>
-      <path d="M3 8h18v11H3zM8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18" />
-    </svg>
-  );
-}
-function CartIcon({ className }: OptionIconProps) {
-  return (
-    <svg className={className} {...iconProps}>
-      <path d="M3 4h2l2.2 11.4a1 1 0 0 0 1 .8h8.6a1 1 0 0 0 1-.8L20 8H6M9 20h.01M17 20h.01" />
-    </svg>
-  );
-}
-function SwapIcon({ className }: OptionIconProps) {
-  return (
-    <svg className={className} {...iconProps}>
-      <path d="M4 8h12l-3-3M20 16H8l3 3" />
-    </svg>
-  );
-}
-function DotsIcon({ className }: OptionIconProps) {
-  return (
-    <svg className={className} {...iconProps}>
-      <path d="M5 12h.01M12 12h.01M19 12h.01" />
-    </svg>
-  );
-}
-function SeedIcon({ className }: OptionIconProps) {
-  return (
-    <svg className={className} {...iconProps}>
-      <path d="M12 20v-8M12 12c0-3 2-5 6-5 0 4-2 6-6 6ZM12 14c0-2-1.5-3-4-3 0 2 1.5 3 4 3Z" />
-    </svg>
-  );
-}
-function SproutIcon({ className }: OptionIconProps) {
-  return (
-    <svg className={className} {...iconProps}>
-      <path d="M12 20v-7M12 13c0-2 1.5-3 4-3 0 2-1.5 3-4 3ZM12 15c0-2.5-2-4-5-4 0 2.5 2 4 5 4Z" />
-    </svg>
-  );
-}
-function ChartUpIcon({ className }: OptionIconProps) {
-  return (
-    <svg className={className} {...iconProps}>
-      <path d="M4 19h16M5 16l4-4 3 3 6-7" />
-    </svg>
-  );
-}
-function BuildingIcon({ className }: OptionIconProps) {
-  return (
-    <svg className={className} {...iconProps}>
-      <path d="M5 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M15 21V11h4a1 1 0 0 1 1 1v9M8 8h.01M8 12h.01M8 16h.01" />
-    </svg>
-  );
-}
-function MegaphoneIcon({ className }: OptionIconProps) {
-  return (
-    <svg className={className} {...iconProps}>
-      <path d="M4 10v4a1 1 0 0 0 1 1h2l8 4V5L7 9H5a1 1 0 0 0-1 1ZM15 9a3 3 0 0 1 0 6" />
-    </svg>
-  );
-}
-function CapitalIcon({ className }: OptionIconProps) {
-  return (
-    <svg className={className} {...iconProps}>
-      <path d="M12 3v18M7 7c0-1.7 2.2-3 5-3s5 1.3 5 3-2.2 3-5 3-5 1.3-5 3 2.2 3 5 3 5-1.3 5-3" />
-    </svg>
-  );
-}
-function UserPlusIcon({ className }: OptionIconProps) {
-  return (
-    <svg className={className} {...iconProps}>
-      <path d="M11 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM3 21v-1a5 5 0 0 1 5-5h3M18 13v6M21 16h-6" />
-    </svg>
-  );
-}
-function HandshakeIcon({ className }: OptionIconProps) {
-  return (
-    <svg className={className} {...iconProps}>
-      <path d="m11 8 3-2 4 2 3 2-2 4-3-2M8 11l3-3 3 3M3 13l3-2 3 3-2 3-3-1M14 17l-2 2-3-3" />
-    </svg>
-  );
-}
-function GlobeIcon({ className }: OptionIconProps) {
-  return (
-    <svg className={className} {...iconProps}>
-      <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" />
-    </svg>
-  );
-}
-const businessTypeIcons: Record<string, (p: OptionIconProps) => ReactElement> = {
-  'product-saas': CubeIcon,
-  'service-agency': BriefcaseIcon,
-  'retail-ecommerce': CartIcon,
-  marketplace: SwapIcon,
-  other: DotsIcon,
-};
+type FieldName = keyof FormValues;
 
-const stageIcons: Record<BusinessStage, (p: OptionIconProps) => ReactElement> = {
-  idea: SeedIcon,
-  early: SproutIcon,
-  growing: ChartUpIcon,
-  established: BuildingIcon,
-};
-
-const mainGoalIcons: Record<string, (p: OptionIconProps) => ReactElement> = {
-  'find-customers': MegaphoneIcon,
-  'raise-capital': CapitalIcon,
-  'hire-talent': UserPlusIcon,
-  'find-partners': HandshakeIcon,
-  'expand-market': GlobeIcon,
-};
-
-const DRAFT_KEY = 'ludavia-form-draft:v1';
-
-const STEP_FIELDS: (keyof Values)[][] = [
-  ['businessName'],
-  ['businessType'],
-  ['industry', 'location'],
-  ['stage'],
-  ['mainGoal', 'helpNeeded'],
-  [],
-];
-
-const STEP_META = [
-  { eyebrow: 'Start', question: 'What should we call your business?', hint: 'A name gives the snapshot somewhere to begin.' },
-  { eyebrow: 'Model', question: 'What kind of business is it?', hint: 'Choose the closest fit. Nothing is permanent.' },
-  { eyebrow: 'Market', question: 'Where do you operate?', hint: 'Tell us your sector and where you call home.' },
-  { eyebrow: 'Stage', question: 'Where are you in the journey?', hint: 'Meet the business where it is today.' },
-  { eyebrow: 'Focus', question: 'What would move it forward?', hint: 'Pick the goal and kind of support that matters most.' },
-  { eyebrow: 'Review', question: 'Check your snapshot.', hint: 'One last look before we map the next step.' },
-] as const;
-
-const EMPTY_VALUES: Values = {
+const EMPTY_VALUES: FormValues = {
   businessName: '',
   businessType: '',
   industry: '',
   location: '',
-  stage: 'idea',
+  stage: '',
   mainGoal: '',
   helpNeeded: '',
   description: '',
 };
 
-function getDraft(): { step: number; values: Values } | null {
+const DRAFT_KEY = 'ludavia-form-draft:v2';
+const TOTAL_STEPS = 5;
+
+const STEP_FIELDS: ReadonlyArray<ReadonlyArray<FieldName>> = [
+  ['businessName'],
+  ['businessType'],
+  ['industry', 'location'],
+  ['stage'],
+  ['mainGoal', 'helpNeeded'],
+];
+
+const STEP_META = [
+  { eyebrow: 'Start', lead: 'What should we call', highlight: 'your business?', hint: 'A name gives the snapshot somewhere to begin.' },
+  { eyebrow: 'Model', lead: 'What kind of', highlight: 'business is it?', hint: 'Choose the closest fit. Nothing is permanent.' },
+  { eyebrow: 'Market', lead: 'Where do you', highlight: 'operate?', hint: 'Tell us your sector and where you call home.' },
+  { eyebrow: 'Stage', lead: 'Where are you in', highlight: 'the journey?', hint: 'Meet the business where it is today.' },
+  { eyebrow: 'Focus', lead: 'What would', highlight: 'move it forward?', hint: 'Pick the goal and kind of support that matters most.' },
+] as const;
+
+const businessTypeIcons: Record<string, LucideIcon> = {
+  'product-saas': Building2,
+  'service-agency': Handshake,
+  'retail-ecommerce': Globe2,
+  marketplace: ArrowUpRight,
+  other: CircleHelp,
+};
+
+const stageIcons: Record<BusinessStage, LucideIcon> = {
+  idea: Lightbulb,
+  early: ArrowUpRight,
+  growing: TrendingUp,
+  established: Square,
+};
+
+const mainGoalIcons: Record<string, LucideIcon> = {
+  'find-customers': Megaphone,
+  'raise-capital': DollarSign,
+  'hire-talent': Plus,
+  'find-partners': Handshake,
+  'expand-market': Globe2,
+};
+
+function getDraft(): { step: number; values: FormValues } | null {
   try {
-    if (typeof window === 'undefined') return null;
     const raw = window.localStorage.getItem(DRAFT_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as { step?: number; values?: Partial<Values> };
+    const parsed = JSON.parse(raw) as { step?: number; values?: Partial<FormValues> };
     if (typeof parsed.step !== 'number' || !parsed.values) return null;
-    return { step: parsed.step, values: { ...EMPTY_VALUES, ...parsed.values } };
+
+    const stage = parsed.values.stage;
+    const validStage = stage === 'idea' || stage === 'early' || stage === 'growing' || stage === 'established' ? stage : '';
+
+    return {
+      step: Math.min(Math.max(Math.round(parsed.step), 0), TOTAL_STEPS - 1),
+      values: { ...EMPTY_VALUES, ...parsed.values, stage: validStage },
+    };
   } catch {
     return null;
   }
 }
 
-function saveDraft(step: number, values: Values) {
+function saveDraft(step: number, values: FormValues) {
   try {
-    if (typeof window === 'undefined') return;
     window.localStorage.setItem(DRAFT_KEY, JSON.stringify({ step, values }));
   } catch {
-    /* ignore */
+    // Draft persistence is best effort in a private prototype.
   }
 }
 
 function clearDraft() {
   try {
-    if (typeof window !== 'undefined') window.localStorage.removeItem(DRAFT_KEY);
+    window.localStorage.removeItem(DRAFT_KEY);
   } catch {
-    /* ignore */
+    // Ignore storage restrictions; the session handoff is still attempted.
   }
 }
 
-function focusFirstInvalid(field: keyof Values) {
-  if (typeof document === 'undefined') return;
-  const wrapper = document.querySelector(`[data-field="${field}"]`);
+function focusFirstInvalid(field: FieldName) {
+  const wrapper = document.querySelector<HTMLElement>(`[data-field="${field}"]`);
   if (!wrapper) return;
-  const target = wrapper.querySelector<HTMLElement>(
-    'input:not([type=hidden]),textarea,select,button,[role="radiogroup"],[tabindex]:not([tabindex="-1"])',
-  );
-  target?.focus({ preventScroll: false });
+  const target = wrapper.querySelector<HTMLElement>('input, select, textarea, button');
+  target?.focus({ preventScroll: true });
   wrapper.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
-export function BusinessNeedsForm() {
+export function BusinessNeedsForm({ initialStep = 0 }: { initialStep?: number }) {
   const router = useRouter();
+  const headingId = useId();
+  const startingStep = Math.min(Math.max(Math.round(initialStep), 0), TOTAL_STEPS - 1);
   const [hydrated, setHydrated] = useState(false);
-  const [step, setStep] = useState(0);
-  const [values, setValues] = useState<Values>(EMPTY_VALUES);
-  const [errors, setErrors] = useState<Partial<Record<keyof Values, string>>>({});
+  const [step, setStep] = useState(startingStep);
+  const [values, setValues] = useState<FormValues>(EMPTY_VALUES);
+  const [errors, setErrors] = useState<Partial<Record<FieldName, string>>>({});
   const [attempted, setAttempted] = useState(false);
-  const [isNavigating, setIsNavigating] = useState(false);
   const [storageError, setStorageError] = useState<string | null>(null);
-  const progressId = useId();
-
-  const stageRef = useRef<HTMLElement>(null);
-
-  const totalSteps = STEP_FIELDS.length;
+  const [isNavigating, setIsNavigating] = useState(false);
 
   useEffect(() => {
-    const saved = loadBusinessNeeds();
-    const draft = saved ? null : getDraft();
     const frame = window.requestAnimationFrame(() => {
+      const saved = loadBusinessNeeds();
+      const draft = getDraft();
+      const requestedStep = Number(new URLSearchParams(window.location.search).get('step')) - 1;
+      const hasRequestedStep = Number.isInteger(requestedStep) && requestedStep >= 0 && requestedStep < TOTAL_STEPS;
+
       if (draft) {
-        setStep(Math.min(Math.max(draft.step, 0), totalSteps - 1));
+        setStep(hasRequestedStep ? requestedStep : draft.step);
         setValues(draft.values);
       } else if (saved) {
-        setValues(saved);
-        setStep(totalSteps - 1);
+        setStep(hasRequestedStep ? requestedStep : startingStep);
+        setValues({ ...saved, description: saved.description ?? '' });
+      } else {
+        setStep(hasRequestedStep ? requestedStep : startingStep);
       }
+
       setHydrated(true);
     });
 
-    return () => {
-      window.cancelAnimationFrame(frame);
-    };
-  }, [totalSteps]);
+    return () => window.cancelAnimationFrame(frame);
+  }, [startingStep]);
 
   useEffect(() => {
-    if (!hydrated) return;
-    saveDraft(step, values);
-  }, [step, values, hydrated]);
+    if (hydrated) saveDraft(step, values);
+  }, [hydrated, step, values]);
 
-  const visibleErrors = useMemo(() => {
-    if (!attempted) return {};
-    const shown: Partial<Record<keyof Values, string>> = {};
-    const fields = STEP_FIELDS[step];
-    for (const f of fields) {
-      if (errors[f]) shown[f] = errors[f];
-    }
-    return shown;
-  }, [attempted, errors, step]);
-
-  function update<K extends keyof Values>(field: K, value: Values[K]) {
-    setValues((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
-    if (storageError) setStorageError(null);
+  function update<K extends keyof FormValues>(field: K, value: FormValues[K]) {
+    setValues((current) => ({ ...current, [field]: value }));
+    setErrors((current) => ({ ...current, [field]: undefined }));
+    setStorageError(null);
   }
 
-  function validateCurrentStep(): boolean {
-    const fields = STEP_FIELDS[step];
-    if (fields.length === 0) return true;
+  function validateCurrentStep() {
     const result = normalizeBusinessNeeds(values);
-    const shown: Partial<Record<keyof Values, string>> = {};
-    let firstInvalid: keyof Values | null = null;
-    for (const f of fields) {
-      if (!result.success && result.errors[f]) {
-        shown[f] = result.errors[f];
-        if (firstInvalid === null) firstInvalid = f;
+    const nextErrors: Partial<Record<FieldName, string>> = {};
+    let firstInvalid: FieldName | null = null;
+
+    for (const field of STEP_FIELDS[step]) {
+      const message = result.success ? undefined : result.errors[field as keyof BusinessNeedsInput];
+      if (message) {
+        nextErrors[field] = message;
+        if (!firstInvalid) firstInvalid = field;
       }
     }
-    setErrors((prev) => ({ ...prev, ...shown }));
+
+    setErrors(nextErrors);
     if (firstInvalid) {
       setAttempted(true);
       focusFirstInvalid(firstInvalid);
       return false;
     }
+
     return true;
   }
 
-  function goNext() {
-    setAttempted(true);
-    if (!validateCurrentStep()) return;
-    setAttempted(false);
-    setErrors({});
-    setStep((s) => Math.min(s + 1, totalSteps - 1));
-    requestAnimationFrame(() => stageRef.current?.scrollTo({ top: 0, behavior: 'smooth' }));
-  }
-
-  function goToStep(target: number) {
-    setAttempted(false);
-    setErrors({});
-    setStep(Math.min(Math.max(target, 0), totalSteps - 1));
-  }
-
-  function handleSubmit() {
-    if (isNavigating) return;
+  function submitSnapshot() {
     const result = normalizeBusinessNeeds(values);
     if (!result.success) {
-      const fieldOrder: (keyof Values)[] = ['businessName', 'businessType', 'industry', 'location', 'stage', 'mainGoal', 'helpNeeded'];
-      let firstInvalid: keyof Values | null = null;
-      const shown: Partial<Record<keyof Values, string>> = {};
-      for (const f of fieldOrder) {
-        if (result.errors[f]) {
-          shown[f] = result.errors[f];
-          if (firstInvalid === null) firstInvalid = f;
-        }
+      const nextErrors: Partial<Record<FieldName, string>> = {};
+      const fieldOrder: FieldName[] = ['businessName', 'businessType', 'industry', 'location', 'stage', 'mainGoal', 'helpNeeded'];
+      const firstInvalid = fieldOrder.find((field) => result.errors[field as keyof BusinessNeedsInput]);
+
+      for (const field of fieldOrder) {
+        const message = result.errors[field as keyof BusinessNeedsInput];
+        if (message) nextErrors[field] = message;
       }
-      setErrors(shown);
+
+      setErrors(nextErrors);
       setAttempted(true);
       if (firstInvalid) {
-        const targetStep = STEP_FIELDS.findIndex((fields) => fields.includes(firstInvalid as keyof Values));
-        if (targetStep >= 0) setStep(targetStep);
-        focusFirstInvalid(firstInvalid);
+        const targetStep = STEP_FIELDS.findIndex((fields) => fields.includes(firstInvalid));
+        setStep(targetStep < 0 ? 0 : targetStep);
+        requestAnimationFrame(() => focusFirstInvalid(firstInvalid));
       }
       return;
     }
+
     clearDraft();
-    const saved = saveBusinessNeeds(result.data);
-    if (!saved) {
-      setStorageError('Your snapshot could not be saved in this browser. Your answers are still here — try again.');
+    if (!saveBusinessNeeds(result.data)) {
+      setStorageError('Your snapshot could not be saved in this browser. Try again or allow session storage.');
       return;
     }
+
     setStorageError(null);
     setIsNavigating(true);
     router.push('/results');
   }
 
+  function handleContinue() {
+    setAttempted(true);
+    if (!validateCurrentStep()) return;
+
+    setAttempted(false);
+    setErrors({});
+    if (step === TOTAL_STEPS - 1) {
+      submitSnapshot();
+      return;
+    }
+
+    setStep((current) => Math.min(current + 1, TOTAL_STEPS - 1));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function handleBack() {
+    if (step === 0) {
+      router.push('/');
+      return;
+    }
+    setAttempted(false);
+    setErrors({});
+    setStep((current) => Math.max(current - 1, 0));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   const meta = STEP_META[step];
-  const isLast = step === totalSteps - 1;
-  const progress = Math.round(((step + 1) / totalSteps) * 100);
+  const progress = Math.round(((step + 1) / TOTAL_STEPS) * 100);
 
   return (
-    <main className="form-wizard" aria-labelledby={progressId}>
-      <GlobeVisual className="form-wizard__globe" />
-
-      <section className="form-wizard__layout">
-        <header className="form-wizard__topline">
-          <Text type="label" color="accent">
-            {meta.eyebrow}
-          </Text>
+    <main className="relative min-h-screen overflow-hidden bg-ink px-3 py-3 text-warm sm:px-6 sm:py-6">
+      <div className="noise-layer" />
+      <div className="dot-layer" />
+      <section className="relative z-10 mx-auto flex min-h-[calc(100dvh-1.5rem)] w-full max-w-[48rem] flex-col overflow-hidden rounded-[1.55rem] border border-white/15 bg-[#0b0b0f]/88 shadow-2xl shadow-black/40 sm:min-h-[calc(100dvh-3rem)] sm:rounded-[2rem]">
+        <header className="flex items-center gap-4 px-5 pb-5 pt-5 sm:gap-7 sm:px-9 sm:pb-7 sm:pt-8">
+          <button type="button" className="icon-button inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.025] text-white transition hover:border-white/30 hover:bg-white/[0.08]" aria-label={step === 0 ? 'Back to welcome page' : 'Go to previous step'} onClick={handleBack}>
+            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+          </button>
+          <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-2">
+            {Array.from({ length: TOTAL_STEPS }, (_, index) => (
+              <button
+                type="button"
+                key={index}
+                className="progress-segment min-w-0 flex-1"
+                data-complete={index <= step}
+                aria-label={`Go to step ${index + 1}`}
+                onClick={() => {
+                  if (index < step) {
+                    setAttempted(false);
+                    setErrors({});
+                    setStep(index);
+                  }
+                }}
+              />
+            ))}
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <p className="text-xs text-white/70 sm:text-sm">Step {step + 1} <span className="text-white/35">of</span> {TOTAL_STEPS}</p>
+            <ThemeToggle />
+          </div>
         </header>
 
-        {storageError ? (
-          <section className="form-wizard__storage-error">
-            <Banner status="error" title="Couldn't save your snapshot" description={storageError} container="card" />
-          </section>
-        ) : null}
+        <form className="flex min-h-0 flex-1 flex-col" onSubmit={(event) => { event.preventDefault(); handleContinue(); }}>
+          <motion.div key={step} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="flex flex-1 flex-col px-5 pb-8 sm:px-9 sm:pb-9">
+            <div className="mb-8 max-w-2xl sm:mb-10">
+              <p className="mb-4 text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-violet-bright">{meta.eyebrow}</p>
+              <h1 id={headingId} className="max-w-[16ch] font-display text-[clamp(2.75rem,7vw,4.85rem)] font-normal leading-[0.96] tracking-[-0.055em] text-white">
+                <TextAnimate>{meta.lead}</TextAnimate>
+                <br />
+                <span className="text-violet-bright">{meta.highlight}</span>
+              </h1>
+              <p className="mt-6 max-w-[42ch] text-base leading-7 text-white/60 sm:text-lg">{meta.hint}</p>
+            </div>
 
-        <section className="form-wizard__stage" ref={stageRef} tabIndex={-1}>
-          <article key={step} className="form-wizard__step" data-step={step}>
-            <header className="form-wizard__intro">
-              <Heading level={1} id={progressId} className="form-wizard__question" textWrap="balance">
-                {meta.question}
-              </Heading>
-              <Text as="p" type="large" color="secondary" className="form-wizard__hint" textWrap="balance">
-                {meta.hint}
-              </Text>
-            </header>
-
-            <fieldset className="form-wizard__fields">
-              <legend className="form-wizard__sr-only">{meta.question}</legend>
-
-              {step === 0 && (
-                <section data-field="businessName">
-                  <TextInput
+            <fieldset className="min-w-0 flex-1" aria-labelledby={headingId}>
+              <legend className="sr-only">{meta.lead} {meta.highlight}</legend>
+              {step === 0 ? (
+                <div data-field="businessName">
+                  <TextField
+                    id="businessName"
                     label="Business name"
-                    isLabelHidden
-                    size="lg"
-                    value={values.businessName}
                     placeholder="e.g. Halcyon Studio"
-                    hasAutoFocus
-                    hasClear
-                    status={visibleErrors.businessName ? { type: 'error', message: visibleErrors.businessName } : undefined}
-                    statusVariant="attached"
-                    onChange={(v) => update('businessName', v)}
-                    onEnter={goNext}
+                    value={values.businessName}
+                    error={attempted ? errors.businessName : undefined}
+                    autoFocus
+                    onChange={(value) => update('businessName', value)}
                   />
-                </section>
-              )}
+                </div>
+              ) : null}
 
-              {step === 1 && (
-                <OptionGrid
+              {step === 1 ? (
+                <ChoiceGrid
                   field="businessType"
                   ariaLabel="Business type"
                   options={businessTypeOptions}
                   value={values.businessType}
-                  onSelect={(v) => update('businessType', v)}
-                  renderIcon={(value) => {
-                    const Icon = businessTypeIcons[value];
-                    return Icon ? <Icon className="option-card__icon" /> : null;
-                  }}
-                  error={visibleErrors.businessType}
+                  icons={businessTypeIcons}
+                  error={attempted ? errors.businessType : undefined}
+                  onSelect={(value) => update('businessType', value)}
                 />
-              )}
+              ) : null}
 
-              {step === 2 && (
-                <VStack gap={4} data-field="industry-location">
-                  <section data-field="industry">
-                    <Selector
-                      label="Sector"
-                      placeholder="Choose a sector"
-                      size="lg"
-                      hasSearch
-                      searchPlaceholder="Search sectors..."
-                      value={values.industry}
-                      options={industryOptions.map((o) => ({ value: o.value, label: o.label }))}
-                      onChange={(v) => update('industry', v)}
-                      status={visibleErrors.industry ? { type: 'error', message: visibleErrors.industry } : undefined}
-                    />
-                  </section>
-                  <section data-field="location">
-                    <TextInput
+              {step === 2 ? (
+                <div className="grid gap-4" data-field="industry-location">
+                  <SelectField
+                    id="industry"
+                    label="Sector"
+                    placeholder="Choose a sector"
+                    options={industryOptions}
+                    value={values.industry}
+                    icon={Building2}
+                    error={attempted ? errors.industry : undefined}
+                    onChange={(value) => update('industry', value)}
+                  />
+                  <div data-field="location">
+                    <TextField
+                      id="location"
                       label="Location"
-                      size="lg"
-                      value={values.location}
                       placeholder="City, region, or country"
-                      hasClear
-                      status={visibleErrors.location ? { type: 'error', message: visibleErrors.location } : undefined}
-                      statusVariant="attached"
-                      onChange={(v) => update('location', v)}
-                      onEnter={goNext}
+                      value={values.location}
+                      icon={MapPin}
+                      error={attempted ? errors.location : undefined}
+                      onChange={(value) => update('location', value)}
                     />
-                  </section>
-                </VStack>
-              )}
+                  </div>
+                </div>
+              ) : null}
 
-              {step === 3 && (
-                <OptionGrid
+              {step === 3 ? (
+                <ChoiceGrid
                   field="stage"
                   ariaLabel="Business stage"
                   options={stageOptions}
                   value={values.stage}
-                  onSelect={(v) => update('stage', v as BusinessStage)}
-                  renderIcon={(value) => {
-                    const Icon = stageIcons[value as BusinessStage];
-                    return Icon ? <Icon className="option-card__icon" /> : null;
-                  }}
-                  error={visibleErrors.stage}
+                  icons={stageIcons}
+                  error={attempted ? errors.stage : undefined}
+                  onSelect={(value) => update('stage', value as BusinessStage)}
                 />
-              )}
+              ) : null}
 
-              {step === 4 && (
-                <VStack gap={5}>
-                  <OptionGrid
+              {step === 4 ? (
+                <div className="grid gap-5">
+                  <ChoiceGrid
                     field="mainGoal"
                     ariaLabel="Main goal"
                     options={mainGoalOptions}
                     value={values.mainGoal}
-                    onSelect={(v) => update('mainGoal', v)}
-                    renderIcon={(value) => {
-                      const Icon = mainGoalIcons[value];
-                      return Icon ? <Icon className="option-card__icon" /> : null;
-                    }}
-                    error={visibleErrors.mainGoal}
+                    icons={mainGoalIcons}
+                    error={attempted ? errors.mainGoal : undefined}
+                    onSelect={(value) => update('mainGoal', value)}
                   />
-                  <section data-field="helpNeeded">
-                    <Selector
+                  <div data-field="helpNeeded">
+                    <SelectField
+                      id="helpNeeded"
                       label="Where do you need help?"
                       placeholder="Choose one"
-                      size="lg"
-                      hasSearch
-                      searchPlaceholder="Search..."
+                      options={helpNeededOptions}
                       value={values.helpNeeded}
-                      options={helpNeededOptions.map((o) => ({ value: o.value, label: o.label }))}
-                      onChange={(v) => update('helpNeeded', v)}
-                      status={visibleErrors.helpNeeded ? { type: 'error', message: visibleErrors.helpNeeded } : undefined}
+                      icon={CircleHelp}
+                      error={attempted ? errors.helpNeeded : undefined}
+                      onChange={(value) => update('helpNeeded', value)}
                     />
-                  </section>
-                </VStack>
-              )}
-
-              {isLast && <ReviewSummary values={values} onEdit={goToStep} />}
+                  </div>
+                  <TextAreaField
+                    id="description"
+                    label="Anything else? (optional)"
+                    placeholder="A little more context can sharpen the snapshot."
+                    value={values.description}
+                    maxLength={500}
+                    onChange={(value) => update('description', value)}
+                  />
+                </div>
+              ) : null}
             </fieldset>
 
-            <nav className="form-wizard__actions" aria-label={isLast ? 'Submit navigation' : 'Step navigation'}>
-              <Button
-                variant="primary"
-                size="lg"
-                label={isLast ? 'See opportunities' : 'Continue'}
-                className="form-wizard__continue"
-                isLoading={isNavigating}
-                onClick={isLast ? handleSubmit : goNext}
-                endContent={
-                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <path d="M5 12h13M13 6l6 6-6 6" />
-                  </svg>
-                }
-              />
-            </nav>
-          </article>
-        </section>
-      </section>
+            {storageError ? (
+              <p className="mt-5 flex items-start gap-2 text-sm leading-6 text-rose-300" role="alert">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                {storageError}
+              </p>
+            ) : null}
 
-      <footer className="form-wizard__dock" aria-label="Journey progress">
-        <HStack hAlign="between" vAlign="center" className="form-wizard__dock-head">
-          <Text type="label" color="secondary">
-            Journey
-          </Text>
-          <Text type="label" color="primary">
-            {progress}%
-          </Text>
-        </HStack>
-        <progress className="form-wizard__progress-bar" value={progress} max="100" aria-label={`Journey progress: ${progress}%`}>
-          {progress}%
-        </progress>
-      </footer>
+            <div className="mt-8 sm:mt-10">
+              <ShimmerButton type="submit" className="w-full justify-between" disabled={isNavigating}>
+                <span>{isNavigating ? 'Saving snapshot' : 'Continue'}</span>
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-violet-bright text-white shadow-[0_0_24px_rgba(164,109,255,0.38)] transition-transform duration-300 group-hover:translate-x-1">
+                  <ArrowRight className="h-5 w-5" aria-hidden="true" />
+                </span>
+              </ShimmerButton>
+            </div>
+          </motion.div>
+        </form>
+
+        <footer className="mt-auto border-t border-white/10 px-5 pb-6 pt-5 sm:px-9 sm:pb-8">
+          <div className="mb-3 flex items-center justify-between text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-white/55">
+            <span>Journey</span>
+            <span className="text-white">{progress}%</span>
+          </div>
+          <div className="journey-track" aria-label={`Journey progress: ${progress}%`} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}>
+            <div className="journey-track__fill" style={{ width: `${progress}%` }} />
+          </div>
+        </footer>
+      </section>
     </main>
   );
 }
 
-type OptionGridProps = {
-  field: keyof Values;
+type ChoiceGridProps = {
+  field: FieldName;
   ariaLabel: string;
-  options: ReadonlyArray<{ value: string; label: string; description?: string; isFull?: boolean }>;
+  options: ReadonlyArray<FormOption>;
   value: string;
-  onSelect: (value: string) => void;
-  renderIcon: (value: string) => React.ReactNode;
+  icons: Record<string, LucideIcon>;
   error?: string;
+  onSelect: (value: string) => void;
 };
 
-function OptionGrid({ field, ariaLabel, options, value, onSelect, renderIcon, error }: OptionGridProps) {
+function ChoiceGrid({ field, ariaLabel, options, value, icons, error, onSelect }: ChoiceGridProps) {
   return (
-    <VStack gap={3} data-field={field} role="group" aria-label={ariaLabel}>
-      <VStack gap={2} className="option-list">
-        {options.map((option, index) => {
-          const selected = value === option.value;
+    <div data-field={field}>
+      <div className="grid gap-2.5" role="radiogroup" aria-label={ariaLabel}>
+        {options.map((option) => {
+          const selected = option.value === value;
+          const Icon = icons[option.value];
+
           return (
-            <article
-              className="option-card"
+            <button
+              type="button"
               key={option.value}
-              style={{ '--option-index': index } as CSSProperties}
+              className="choice-card group flex min-h-[4.75rem] w-full items-center gap-4 rounded-2xl px-4 py-3.5 text-left sm:px-5"
+              data-selected={selected}
+              role="radio"
+              aria-checked={selected}
+              onClick={() => onSelect(option.value)}
             >
-              <SelectableCard
-                label={option.label}
-                isSelected={selected}
-                onChange={(isSelected) => {
-                  if (isSelected) onSelect(option.value);
-                }}
-                variant="transparent"
-                padding={0}
-              >
-                <section className="option-card__body">
-                  {renderIcon(option.value)}
-                  <section className="option-card__text">
-                    <Text type="body" weight="medium" className="option-card__label">
-                      {option.label}
-                    </Text>
-                    {option.description ? (
-                      <Text type="supporting" className="option-card__desc" textWrap="balance">
-                        {option.description}
-                      </Text>
-                    ) : null}
-                  </section>
-                  <i className="option-card__check" aria-hidden="true">
-                    <svg {...iconProps}>
-                      <path d="m5 12 4 4 10-10" />
-                    </svg>
-                  </i>
-                </section>
-              </SelectableCard>
-            </article>
+              <span className="radio-dot inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full" aria-hidden="true" />
+              {Icon ? (
+                <span className="choice-icon inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/[0.035] text-white/60 transition-colors">
+                  <Icon className="h-5 w-5" strokeWidth={1.5} aria-hidden="true" />
+                </span>
+              ) : null}
+              <span className="min-w-0 flex-1">
+                <span className="block text-[0.98rem] font-semibold text-white">{option.label}</span>
+                {option.description ? <span className="mt-1 block text-sm leading-5 text-white/55">{option.description}</span> : null}
+              </span>
+              {selected ? <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-violet-bright shadow-[0_0_14px_rgba(164,109,255,0.75)]" aria-hidden="true" /> : null}
+            </button>
           );
         })}
-      </VStack>
-      {error ? <FieldStatus type="error" message={error} variant="detached" /> : null}
-    </VStack>
+      </div>
+      {error ? <p className="mt-3 flex items-center gap-2 text-sm text-rose-300" role="alert"><AlertCircle className="h-4 w-4" aria-hidden="true" />{error}</p> : null}
+    </div>
   );
 }
 
-type ReviewSummaryProps = {
-  values: Values;
-  onEdit: (step: number) => void;
+type TextFieldProps = {
+  id: string;
+  label: string;
+  placeholder: string;
+  value: string;
+  error?: string;
+  autoFocus?: boolean;
+  icon?: LucideIcon;
+  onChange: (value: string) => void;
 };
 
-const REVIEW_ROWS: Array<{ field: keyof Values; label: string; step: number; optional?: boolean }> = [
-  { field: 'businessName', label: 'Business name', step: 0 },
-  { field: 'businessType', label: 'Business type', step: 1 },
-  { field: 'industry', label: 'Sector', step: 2 },
-  { field: 'location', label: 'Location', step: 2 },
-  { field: 'stage', label: 'Stage', step: 3 },
-  { field: 'mainGoal', label: 'Main goal', step: 4 },
-  { field: 'helpNeeded', label: 'Help needed', step: 4 },
-];
-
-function ReviewSummary({ values, onEdit }: ReviewSummaryProps) {
+function TextField({ id, label, placeholder, value, error, autoFocus, icon: Icon, onChange }: TextFieldProps) {
   return (
-    <ul className="review">
-      {REVIEW_ROWS.map((row) => {
-        const raw = values[row.field];
-        const display = labelForField(row.field, typeof raw === 'string' ? raw : undefined) || 'Not provided';
-        const isPlaceholder = display === 'Not provided';
-        return (
-          <li className="review__row" key={row.field}>
-            <Text as="p" type="label" color="secondary" className="review__label">
-              {row.label}
-            </Text>
-            <Text as="p" type="body" color={isPlaceholder ? 'disabled' : 'primary'} className="review__value" textWrap="balance">
-              {display}
-            </Text>
-            <Button variant="ghost" size="sm" label="Edit" onClick={() => onEdit(row.step)} className="review__edit" />
-          </li>
-        );
-      })}
-    </ul>
+    <label className="block" htmlFor={id}>
+      <span className="sr-only">{label}</span>
+      <span className="relative block">
+        {Icon ? <Icon className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-violet-bright" strokeWidth={1.5} aria-hidden="true" /> : null}
+        <input id={id} className={cn('form-input rounded-2xl px-5 py-5 text-base sm:text-lg', Icon && 'pl-14')} value={value} placeholder={placeholder} autoFocus={autoFocus} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined} onChange={(event) => onChange(event.target.value)} />
+      </span>
+      {error ? <span id={`${id}-error`} className="mt-2 block text-sm text-rose-300" role="alert">{error}</span> : null}
+    </label>
+  );
+}
+
+type SelectFieldProps = {
+  id: string;
+  label: string;
+  placeholder: string;
+  options: ReadonlyArray<FormOption>;
+  value: string;
+  error?: string;
+  icon: LucideIcon;
+  onChange: (value: string) => void;
+};
+
+function SelectField({ id, label, placeholder, options, value, error, icon: Icon, onChange }: SelectFieldProps) {
+  return (
+    <label className="block" htmlFor={id}>
+      <span className="sr-only">{label}</span>
+      <span className="relative block">
+        <Icon className="pointer-events-none absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-violet-bright" strokeWidth={1.5} aria-hidden="true" />
+        <select id={id} className="form-select appearance-none rounded-2xl px-5 py-5 pl-14 pr-12 text-base text-white sm:text-lg" value={value} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined} onChange={(event) => onChange(event.target.value)}>
+          <option value="" disabled>{placeholder}</option>
+          {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+        </select>
+        <ChevronDown className="pointer-events-none absolute right-5 top-1/2 h-5 w-5 -translate-y-1/2 text-white/75" aria-hidden="true" />
+      </span>
+      {error ? <span id={`${id}-error`} className="mt-2 block text-sm text-rose-300" role="alert">{error}</span> : null}
+    </label>
+  );
+}
+
+type TextAreaFieldProps = {
+  id: string;
+  label: string;
+  placeholder: string;
+  value: string;
+  maxLength: number;
+  onChange: (value: string) => void;
+};
+
+function TextAreaField({ id, label, placeholder, value, maxLength, onChange }: TextAreaFieldProps) {
+  return (
+    <label className="block" htmlFor={id}>
+      <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-white/45">{label}</span>
+      <textarea id={id} className="form-textarea min-h-24 resize-y rounded-2xl px-5 py-4 text-base leading-6" value={value} placeholder={placeholder} maxLength={maxLength} onChange={(event) => onChange(event.target.value)} />
+      <span className="mt-2 block text-right text-xs text-white/35">{value.length}/{maxLength}</span>
+    </label>
   );
 }
