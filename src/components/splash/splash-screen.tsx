@@ -21,7 +21,7 @@ export function SplashScreen() {
         <div className="splash-light pointer-events-none absolute inset-x-0 top-0 h-80" />
         <div className="splash-content relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center px-6 text-center sm:px-10">
           <h1 className="splash-heading max-w-3xl font-sans font-medium text-white">
-            <TextAnimate delay={0.15}>Begin your</TextAnimate>
+            <TextAnimate className="splash-heading__lead" delay={0.15}>Begin your</TextAnimate>
             <span className="splash-heading__accent block">journey.</span>
           </h1>
           <p className="splash-subtitle max-w-md text-white/65">A clear view of what comes next.</p>

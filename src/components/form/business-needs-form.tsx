@@ -64,6 +64,7 @@ const EMPTY_VALUES: FormValues = {
 
 const DRAFT_KEY = 'ludavia-form-draft:v2';
 const TOTAL_STEPS = 5;
+const PROGRESS_SEGMENTS = TOTAL_STEPS * 2;
 
 const STEP_FIELDS: ReadonlyArray<ReadonlyArray<FieldName>> = [
   ['businessName'],
