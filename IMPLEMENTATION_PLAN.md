@@ -11,7 +11,7 @@
 - Not in scope brand systems: anything referencing “Connect & Grow AI”, charcoal/deep-blue/bronze palettes, or full production specs (auth, billing, admin, moderation). Ignore those docs if found.
 **Stack:**
 - Next.js (App Router) — UI + minimal API route for Gemini
-- GSAP — motion (load/scroll text reveals, page transitions; optional preloader)
+- Motion (framer-motion) — motion (load/scroll text reveals, page transitions; optional preloader)
 - [Astryx](https://astryx.atmeta.com) (`@astryxdesign/core` + theme packages) — component library
 - Gemini API — real call for the growth summary (demo key will be provided; simple config is fine, not production secret handling)
 **Logos:** Approved LudaVia logo files (light-bg and dark-bg variants) will be placed in the repo. Use them **unchanged**. Do not redraw or reinterpret.
@@ -25,7 +25,7 @@ This plan was re-verified on **2026-08-05** against the empty repository and cur
 - Repository state at audit: only `.git/` and this plan existed; no application code or logo assets were present.
 - Astryx is confirmed real and usable at `https://astryx.atmeta.com`; its current docs describe `@astryxdesign/core`, theme packages, CLI agent docs, CSS-layer rules, and React 19+ support.
 - Astryx CLI is a **development dependency**, and `astryx doctor` is the setup health check. Do not replace Astryx with shadcn, Radix, or an invented component library if installation fails; mark the stage BLOCKED and report the failure.
-- Next.js App Router pages/layouts are server components by default. Any code using `sessionStorage`, `localStorage`, `window`, GSAP, or event handlers must sit behind a client boundary.
+- Next.js App Router pages/layouts are server components by default. Any code using `sessionStorage`, `localStorage`, `window`, Motion, or event handlers must sit behind a client boundary.
 - Current Google Gemini documentation recommends the `@google/genai` SDK. The older `@google/generative-ai` package is not the planned integration.
 - `gemini-2.0-flash` is listed by current Google documentation as shut down. The API stage must verify the current stable fast Flash model before coding; at this audit, `gemini-3.6-flash` is listed as stable and `gemini-2.5-flash` remains a stable fallback candidate.
 - Approved logos were not present at audit time. Their exact filenames and intended background variants must be recorded before the logo stage is marked complete.
@@ -126,7 +126,7 @@ Create/keep roughly this tree (adjust only if a stage requires it):
 │   │   │   ├── results-session-gate.tsx
 │   │   │   └── results-shell.tsx
 │   │   └── motion/
-│   │       └── gsap-*.tsx           ← as needed
+│   │       └── motion-*.tsx         ← as needed
 │   ├── data/
 │   │   ├── form-options.ts
 │   │   ├── sample-opportunity.ts
@@ -200,7 +200,12 @@ Completed: 2026-08-05 — Stage 0 verified: (1) repo root confirmed at `/Users/m
    ```
    If the command refuses a non-empty directory because of this plan file, scaffold manually or use the documented create-next-app option for an existing directory. **Keep `IMPLEMENTATION_PLAN.md`.** If the installed create-next-app does not recognize `--no-tailwind`, answer its prompt so Tailwind is disabled and remove any generated Tailwind wiring.
 2. Use the current stable Next.js release that supports React 19 and Astryx. Do not force an old Next version just because an example repo uses one. Keep React and `react-dom` on compatible React 19 versions.
-3. Do not add Tailwind, shadcn, Radix, Chakra, or another UI library. Astryx CSS plus local CSS modules/global app layout CSS is the intended styling path. Do not add StyleX authoring yet; consuming precompiled Astryx components does not require a StyleX compiler.
+3. Astryx CSS plus local CSS modules/global app layout CSS is the primary styling path, and Astryx components remain the system of record for layout, chrome, and theme tokens. Do not add StyleX authoring yet; consuming precompiled Astryx components does not require a StyleX compiler. Third-party component libraries (e.g. Magic UI, shadcn/ui, GSAP) ARE permitted as optional additions when they bring distinct value, subject to these guardrails:
+   - Add them as isolated copy-paste components (e.g. `src/components/magicui/`), never as a full replacement of Astryx.
+   - Install extra dependencies (Tailwind, framer-motion, clsx, etc.) only if that library actually requires them.
+   - Preserve the Astryx CSS layer order and imports in `globals.css`; never run a library CLI (e.g. `shadcn init`) that overwrites `globals.css`, `layout.tsx`, or component config.
+   - Remap the added library's color variables to Astryx tokens (`var(--color-*)`) so the existing light/dark theme toggle keeps working; do not introduce a second unsynchronized theme source.
+   - Verify the theme toggle, keyboard behavior, reduced motion, and both color modes still pass after any addition.
 4. Keep `moduleResolution: "bundler"` (or the current create-next-app equivalent) so Astryx CSS/subpath imports resolve.
 5. Ensure scripts exist for `dev`, `build`, `start`, and lint. Add a `typecheck` script using `tsc --noEmit` if the scaffold does not provide one.
 6. Replace default marketing boilerplate with a minimal placeholder at `/`: heading `LudaVia` and text `Prototype scaffold`. Do not design the real splash yet.
@@ -214,7 +219,7 @@ Completed: 2026-08-05 — Stage 0 verified: (1) repo root confirmed at `/Users/m
 - [ ] `npm run build` succeeds.
 - [ ] `src/app` App Router structure is in use.
 - [ ] `IMPLEMENTATION_PLAN.md` still present.
-- [ ] No Tailwind or competing component library was added.
+- [ ] No scaffold-time competing UI library was added during creation; later optional additions (e.g. Magic UI) follow the Stage 1 guardrails and keep Astryx theming intact.
 
 **Status: COMPLETED**
 
@@ -490,7 +495,7 @@ Completed: 2026-08-05 — Stage 2 verified: (1) Installed `@astryxdesign/core@0.
    - Single primary CTA: “Start” / “Explore your growth” → navigates to `/form`
    - Optional secondary text line: “Investor prototype” is **not** required on-screen (avoid breaking immersion); keep README honest instead.
 3. Layout: generous whitespace, vertical center on desktop, comfortable padding on mobile. Black-dominant in dark mode. Keep the primary content visible in a 768px-high laptop viewport without forcing a scroll.
-4. No GSAP required yet (Stage 16). CSS-only fade-in is OK.
+4. No Motion required yet (Stage 16). CSS-only fade-in is OK.
 5. CTA uses Astryx primary `Button`.
 6. The splash must not mention Connect & Grow AI, pricing, features, accounts, or production claims. A small `L:V` secondary mark may appear only if it is part of the supplied approved asset; do not type-draw a new logo.
 
@@ -507,7 +512,7 @@ Completed: 2026-08-05 — Stage 2 verified: (1) Installed `@astryxdesign/core@0.
 
 **Model Tier: Medium**
 
-**Verification Notes:** Completed: 2026-08-05 — Stage 7 verified in real browser (Playwright Chromium) at 1280×800/1280×768 and 390×844, both themes. (1) `/` renders splash only: large BrandLogo (132×77, no duplication with the header beyond the planned hero placement), 1px accent rule (`#4e1d8e`, 40×1px), display-2 h1 "See how your business could grow next." (35px via theme `--text-display-2-size`), secondary subcopy, single primary CTA "Explore your growth" — no marketing/features/pricing text. (2) CTA: Astryx primary `Button` renders as `<a href="/form">` with the accent `#4e1d8e` fill + white label; navigation is client-side via Next `Link`. NOTE — the installed Astryx theme only styles `.astryx-text.display-*` (a theme-build gap: `display-*` on `Heading` is unstyled), so a scoped `.splash .astryx-heading.display-2` rule in globals.css completes the intent using the theme's own display tokens (deviation recorded, token-backed). CTA needed a server→client-safe link: `as={Link}` can't cross the server/client boundary, so `LinkProvider component={NextLink}` was added to the client `AppProviders` per the installed Link docs — this is the documented Astryx integration and will serve Stage 11's "Edit details" link (documented deviation: touches `app-providers.tsx`, one line of expected Stage 7 behavior). (3) Click → `/form` (404 placeholder is expected; Stage 8 builds the form); `goBack()` returns to `/` and re-renders splash — no throws. (4) No horizontal scroll at 390px or 1280px (scrollWidth==clientWidth); content fully visible in a 768px-high viewport without scrolling (content bottom 573px of 768px; splash min-height = `100dvh - spacing-11 - 1px`). (5) Keyboard: Tab reaches the CTA (2nd stop after theme switch), accent 2px focus ring `rgb(78,29,142)`, Enter navigates to `/form`. Accessible name from visible text (no aria-label override, per Astryx Link guidance). (6) Motion: CSS-only `splash-rise` fade-up stagger (logo 0ms, headline 120ms, subcopy 220ms, CTA 320ms), `both` fill; `prefers-reduced-motion: reduce` sets `animation: none` (verified computed). GSAP deferred to Stage 16 as planned. (7) Both themes: dark default (`#0b0a0d` body, warm-white h1, muted secondary) and light (`#f5f3f7` body, `#1d1821` h1, `#6d6572` secondary) — designed palette, not inversion; purple appears only on the accent rule, CTA fill, and wordmark. (8) `npm run lint`, `npm run typecheck`, `npm run build` all pass (4 static pages). No console errors on `/` (the two 404 resource errors in the log are the `/form` route, which Stage 8 provides). Screenshots: `/tmp/stage7-1-splash-dark-1280.png`, `stage7-2-splash-dark-390.png`, `stage7-3-splash-light-390.png`.
+**Verification Notes:** Completed: 2026-08-05 — Stage 7 verified in real browser (Playwright Chromium) at 1280×800/1280×768 and 390×844, both themes. (1) `/` renders splash only: large BrandLogo (132×77, no duplication with the header beyond the planned hero placement), 1px accent rule (`#4e1d8e`, 40×1px), display-2 h1 "See how your business could grow next." (35px via theme `--text-display-2-size`), secondary subcopy, single primary CTA "Explore your growth" — no marketing/features/pricing text. (2) CTA: Astryx primary `Button` renders as `<a href="/form">` with the accent `#4e1d8e` fill + white label; navigation is client-side via Next `Link`. NOTE — the installed Astryx theme only styles `.astryx-text.display-*` (a theme-build gap: `display-*` on `Heading` is unstyled), so a scoped `.splash .astryx-heading.display-2` rule in globals.css completes the intent using the theme's own display tokens (deviation recorded, token-backed). CTA needed a server→client-safe link: `as={Link}` can't cross the server/client boundary, so `LinkProvider component={NextLink}` was added to the client `AppProviders` per the installed Link docs — this is the documented Astryx integration and will serve Stage 11's "Edit details" link (documented deviation: touches `app-providers.tsx`, one line of expected Stage 7 behavior). (3) Click → `/form` (404 placeholder is expected; Stage 8 builds the form); `goBack()` returns to `/` and re-renders splash — no throws. (4) No horizontal scroll at 390px or 1280px (scrollWidth==clientWidth); content fully visible in a 768px-high viewport without scrolling (content bottom 573px of 768px; splash min-height = `100dvh - spacing-11 - 1px`). (5) Keyboard: Tab reaches the CTA (2nd stop after theme switch), accent 2px focus ring `rgb(78,29,142)`, Enter navigates to `/form`. Accessible name from visible text (no aria-label override, per Astryx Link guidance). (6) Motion: CSS-only `splash-rise` fade-up stagger (logo 0ms, headline 120ms, subcopy 220ms, CTA 320ms), `both` fill; `prefers-reduced-motion: reduce` sets `animation: none` (verified computed). Motion deferred to Stage 16 as planned. (7) Both themes: dark default (`#0b0a0d` body, warm-white h1, muted secondary) and light (`#f5f3f7` body, `#1d1821` h1, `#6d6572` secondary) — designed palette, not inversion; purple appears only on the accent rule, CTA fill, and wordmark. (8) `npm run lint`, `npm run typecheck`, `npm run build` all pass (4 static pages). No console errors on `/` (the two 404 resource errors in the log are the `/form` route, which Stage 8 provides). Screenshots: `/tmp/stage7-1-splash-dark-1280.png`, `stage7-2-splash-dark-390.png`, `stage7-3-splash-light-390.png`.
 
 ---
 
@@ -856,30 +861,30 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
 
 ---
 
-## Stage 16 — GSAP motion (load, reveal, transitions)
+## Stage 16 — Motion (framer-motion) animation (load, reveal, transitions)
 
-**Objective:** Add restrained GSAP motion that gives the demo a premium sense of arrival without delaying interaction or creating hydration/performance problems.
+**Objective:** Add restrained Motion (framer-motion) animation that gives the demo a premium sense of arrival without delaying interaction or creating hydration/performance problems. Motion is the single motion runtime shared with any Magic UI components added later, so no second animation library is needed.
 
 **Depends on:** Stages 7–15, so motion is applied to stable final surfaces rather than placeholders.
 
 **Expected files changed:** `package.json`, `package-lock.json`, splash/form/results client motion wrappers, and app CSS.
 
 **Instructions:**
-1. Install `gsap`. Use `@gsap/react` and its documented `useGSAP`/context cleanup pattern if compatible with the installed React/GSAP versions. Do not add SplitText or other paid/optional plugins.
-2. Use client-only motion components. Register any plugins in a client module and scope animations to a root ref. Kill/revert animations on unmount.
+1. Install `framer-motion` (or the `motion` package's `motion/react` entry) as a runtime dependency. Only import Motion in `"use client"` components or files with client boundaries.
+2. Define one shared motion vocabulary (a single `variants` set for fade-up reveals, a shared easing curve, and consistent durations) so splash, form, and results all feel like one system.
 3. Splash: logo/title fade-up and CTA reveal with a short, confident sequence. Do not add a preloader by default; only add one if a real asset-loading need is observed, it stays under ~1.2s, and it never hides the CTA on repeat visits.
 4. Form: one subtle section entrance using opacity/transform. Do not animate input values, validation, focus, or layout while the user types.
-5. Results: stagger opportunity card, connection card, featured AI summary, then next-step panel. If using scroll-triggered reveals, use `ScrollTrigger` only where content is below the fold and ensure refresh/cleanup works. A simple enter stagger is preferable to fragile text splitting.
-6. Respect `prefers-reduced-motion: reduce` through `gsap.matchMedia()` or equivalent. Reduced motion must remove non-essential movement while preserving visibility and state changes.
+5. Results: stagger opportunity card, connection card, featured AI summary, then next-step panel. Prefer viewport-based reveals (`whileInView` with `once: true`) for content that is below the fold; a simple enter stagger is preferable to fragile text splitting.
+6. Respect `prefers-reduced-motion: reduce` through `useReducedMotion()` from framer-motion. Reduced motion must remove non-essential movement while preserving visibility and state changes.
 7. Animate transform and opacity, not width/height/top/left or large blur filters. Keep sequences short enough that the presenter can interact immediately.
-8. Keep motion quiet and editorial: no perpetual loops, bouncing CTAs, cursor-followers, screen wipes, or purple/neon effects.
+8. Keep motion quiet and editorial: no perpetual loops, bouncing CTAs, cursor-followers, screen wipes, or purple/neon effects. Stop and reset any ongoing animations when the user navigates away.
 
 **Acceptance criteria:**
 - [ ] Splash animation plays on entry and does not block interaction for more than a brief reveal.
-- [ ] Results cards stagger in without blocking interaction for long and do not re-run unexpectedly on every state update.
+- [ ] Results cards stop configurable on an interaction and do not re-run unexpectedly on every state update.
 - [ ] `prefers-reduced-motion: reduce` disables non-essential motion.
-- [ ] No hydration warnings from GSAP misuse; all browser/GSAP work is client-only.
-- [ ] Navigating away and back does not leave stale tweens or duplicate triggers.
+- [ ] No hydration warnings from Motion misuse; all browser/Motion work is client-only.
+- [ ] Navigating away and back does not leave stale animations or duplicate effects.
 - [ ] Motion remains smooth at 1280px and usable at 390px.
 - [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
