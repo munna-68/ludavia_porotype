@@ -1,16 +1,21 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { AppHeader } from '@/components/chrome/app-header';
 import { Globe } from '@/components/ui/globe';
-import { ShimmerButton } from '@/components/magicui/shimmer-button';
+import { ShimmerButton } from '@/components/ui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
 
 export function SplashScreen() {
+  const router = useRouter();
+
   return (
-    <main className="splash-page relative min-h-screen overflow-hidden bg-ink px-4 py-4 text-warm sm:px-8 sm:py-7">
+    <main className="splash-page relative min-h-[100dvh] overflow-hidden text-warm">
       <div className="noise-layer" />
       <div className="dot-layer" />
 
-      <section className="splash-frame relative isolate mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-[72rem] flex-col overflow-hidden rounded-[1.75rem] border border-white/15 bg-[#0a0a0d]/70 sm:min-h-[calc(100dvh-3.5rem)] sm:rounded-[2rem]">
+      <section className="splash-frame relative isolate mx-auto flex w-full flex-col overflow-hidden rounded-[1.75rem] border border-white/15 sm:rounded-[2rem]">
         <AppHeader minimal />
 
         <div className="splash-light pointer-events-none absolute inset-x-0 top-0 h-80" />
@@ -25,10 +30,19 @@ export function SplashScreen() {
         <Globe className="splash-globe pointer-events-auto left-1/2 z-0 -translate-x-1/2" />
 
         <div className="splash-cta-wrap absolute inset-x-6 z-20 sm:inset-x-1/2 sm:w-[min(74%,40rem)] sm:-translate-x-1/2">
-          <ShimmerButton href="/form" className="splash-cta w-full border-white/35 bg-black/45 px-6 text-lg shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_20px_80px_rgba(240,130,38,0.18)] hover:border-white/65 hover:bg-black/65 sm:px-9 sm:text-xl">
-            <span>Begin your journey</span>
-            <span className="inline-flex items-center text-white transition-transform duration-300 group-hover:translate-x-1">
-              <ArrowRight className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.5} aria-hidden="true" />
+          <ShimmerButton
+            type="button"
+            onClick={() => router.push('/form')}
+            background="rgba(6, 6, 7, 0.9)"
+            borderRadius="999px"
+            shimmerColor="rgba(255, 255, 255, 0.7)"
+            shimmerDuration="4s"
+            shimmerSize="0.04em"
+            className="splash-cta w-full border-white/35 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_24px_90px_rgba(240,130,38,0.2)] hover:border-white/65"
+          >
+            <span className="splash-cta__content">
+              <span>Begin your journey</span>
+              <ArrowRight className="splash-cta__arrow h-7 w-7 sm:h-9 sm:w-9" strokeWidth={1.5} aria-hidden="true" />
             </span>
           </ShimmerButton>
         </div>

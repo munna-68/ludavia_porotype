@@ -110,11 +110,17 @@ select {
 }
 
 .splash-frame {
+  min-height: calc(100dvh - (var(--splash-gutter) * 2));
+  max-width: 72rem;
+  background-color: #0a0a0d;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.025), 0 24px 100px rgba(0, 0, 0, 0.35);
 }
 
 .splash-page {
+  --splash-gutter: clamp(0rem, 5vw, 3rem);
   min-height: 100dvh;
+  padding: var(--splash-gutter);
+  background-color: #080809;
 }
 
 .splash-frame::before {
@@ -134,11 +140,11 @@ select {
 }
 
 .splash-content {
-  padding-top: clamp(8rem, 16vh, 18rem);
+  padding-top: clamp(8rem, 15vh, 18rem);
 }
 
 .splash-heading {
-  font-size: clamp(3.5rem, 8.8vw, 6.25rem);
+  font-size: clamp(3.5rem, 9vw, 6.25rem);
   line-height: 0.84;
   letter-spacing: -0.085em;
   text-wrap: balance;
@@ -146,10 +152,10 @@ select {
 
 .splash-heading__accent {
   margin-top: 0.08em;
-  background: linear-gradient(125deg, #ffac4b 0%, var(--orange) 48%, #c95b13 100%);
+  background: linear-gradient(125deg, var(--violet-bright) 0%, var(--violet) 100%);
   background-clip: text;
   color: transparent;
-  text-shadow: 0 0 34px rgba(240, 130, 38, 0.12);
+  text-shadow: 0 0 34px rgba(164, 109, 255, 0.18);
 }
 
 .splash-subtitle {
@@ -161,24 +167,44 @@ select {
 }
 
 .splash-globe {
-  top: clamp(18rem, 28vh, 35rem);
+  top: clamp(18rem, 31vh, 40rem);
   right: auto;
   bottom: auto;
-  width: 122%;
-  max-width: 75rem;
+  width: 112%;
+  max-width: 66rem;
   aspect-ratio: 1;
+  height: auto;
+  margin: 0;
   filter: drop-shadow(0 0 2.5rem rgba(255, 255, 255, 0.06));
 }
 
 .splash-cta-wrap {
-  bottom: clamp(4rem, 20vh, 23rem);
+  bottom: clamp(5rem, 26vh, 26rem);
 }
 
 .splash-cta {
-  min-height: clamp(4rem, 6vw, 5.75rem);
+  min-height: 6rem;
   border-radius: 999px;
-  font-size: clamp(1.1rem, 2vw, 1.7rem);
+  font-size: clamp(1.1rem, 3vw, 1.7rem);
+  font-weight: 600;
   letter-spacing: -0.035em;
+}
+
+.splash-cta__content {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-inline: clamp(1rem, 7vw, 6rem);
+}
+
+.splash-cta__arrow {
+  transition: transform 300ms ease;
+}
+
+.splash-cta:hover .splash-cta__arrow {
+  transform: translateX(0.35rem);
 }
 
 .app-header {
@@ -396,6 +422,34 @@ html.light .menu-popover {
   box-shadow: 0 20px 50px rgba(20, 18, 24, 0.14);
 }
 
+html.light .splash-page {
+  background-color: #080809 !important;
+  color: #f3f1ed !important;
+}
+
+html.light .splash-page .splash-frame {
+  background-color: #0a0a0d !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+html.light .splash-page [class~='text-white'],
+html.light .splash-page [class*='text-white/'] {
+  color: #ffffff !important;
+}
+
+html.light .splash-page [class*='border-white/'] {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+html.light .splash-page [class*='bg-white/'] {
+  background-color: rgba(255, 255, 255, 0.025) !important;
+}
+
+html.light .splash-page .menu-popover {
+  background: rgba(19, 19, 24, 0.95);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
 @keyframes meteor-fall {
   0% {
     opacity: 0;
@@ -435,7 +489,42 @@ html.light .menu-popover {
   }
 }
 
+@keyframes shimmer-slide {
+  to {
+    transform: translate(calc(100cqw - 100%), 0);
+  }
+}
+
+@keyframes spin-around {
+  0% {
+    transform: translateZ(0) rotate(0);
+  }
+  15%,
+  35% {
+    transform: translateZ(0) rotate(90deg);
+  }
+  65%,
+  85% {
+    transform: translateZ(0) rotate(270deg);
+  }
+  100% {
+    transform: translateZ(0) rotate(360deg);
+  }
+}
+
+.animate-shimmer-slide {
+  animation: shimmer-slide var(--speed) ease-in-out infinite alternate;
+}
+
+.animate-spin-around {
+  animation: spin-around calc(var(--speed) * 2) infinite linear;
+}
+
 @media (max-width: 640px) {
+  .splash-page {
+    --splash-gutter: 0rem;
+  }
+
   .dot-layer {
     background-size: 18px 18px;
   }
@@ -445,12 +534,28 @@ html.light .menu-popover {
   }
 
   .splash-globe {
-    top: 18rem;
-    width: 132%;
+    top: 21rem;
+    width: 110%;
   }
 
   .splash-cta-wrap {
-    bottom: 4.5rem;
+    bottom: 5.5rem;
+  }
+
+  .splash-frame {
+    min-height: 100dvh;
+    border-radius: 0;
+    border-right: 0;
+    border-left: 0;
+  }
+
+  .splash-cta {
+    min-height: 4rem;
+    font-size: 1rem;
+  }
+
+  .splash-cta__content {
+    padding-inline: 0.75rem;
   }
 }
 

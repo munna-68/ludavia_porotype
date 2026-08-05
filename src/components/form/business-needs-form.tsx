@@ -22,7 +22,7 @@ import {
   Square,
   TrendingUp,
 } from 'lucide-react';
-import { ShimmerButton } from '@/components/magicui/shimmer-button';
+import { ShimmerButton } from '@/components/ui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { ThemeToggle } from '@/components/chrome/theme-toggle';
 import { normalizeBusinessNeeds } from '@/lib/business-needs-schema';

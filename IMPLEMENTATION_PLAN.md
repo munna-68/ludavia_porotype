@@ -101,6 +101,7 @@ The resulting failure mode was:
 - Read the official registry source from `https://magicui.design/r/globe.json`.
 - Installed the registry-declared runtime dependencies with `npm install cobe motion`.
 - Added the official Cobe-based implementation at `src/components/ui/globe.tsx`, matching Magic UI's documented import location.
+- Added the official Shimmer Button implementation at `src/components/ui/shimmer-button.tsx` and its required `shimmer-slide`/`spin-around` keyframes in `src/app/globals.css`.
 - Updated the splash screen to import `Globe` from `@/components/ui/globe`.
 - Removed the old local SVG globe recreation. The official component now supplies the dotted map, orange markers, autorotation, and pointer dragging.
 

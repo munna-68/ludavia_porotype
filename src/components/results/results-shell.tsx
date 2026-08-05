@@ -15,7 +15,7 @@ import {
   UserRound,
 } from 'lucide-react';
 import { Meteors } from '@/components/magicui/meteors';
-import { ShimmerButton } from '@/components/magicui/shimmer-button';
+import { ShimmerButton } from '@/components/ui/shimmer-button';
 import { BrandLogo } from '@/components/chrome/brand-logo';
 import { ThemeToggle } from '@/components/chrome/theme-toggle';
 import { sampleConnection } from '@/data/sample-connection';

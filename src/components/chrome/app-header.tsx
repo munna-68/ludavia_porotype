@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Grid3X3, RotateCcw, X } from 'lucide-react';
+import { Ellipsis, RotateCcw, X } from 'lucide-react';
 import { BrandLogo } from '@/components/chrome/brand-logo';
 import { ThemeToggle } from '@/components/chrome/theme-toggle';
 
@@ -28,7 +28,7 @@ export function AppHeader({ minimal = false }: AppHeaderProps) {
             onClick={() => setOpen((current) => !current)}
           >
             <span className="hidden sm:inline">Menu</span>
-            {open ? <X className="h-5 w-5" aria-hidden="true" /> : <Grid3X3 className="h-5 w-5" aria-hidden="true" />}
+            {open ? <X className="h-5 w-5" aria-hidden="true" /> : <Ellipsis className="h-6 w-6" aria-hidden="true" />}
           </button>
           {open ? (
             <nav id="ludavia-menu" className="menu-popover absolute right-0 top-[calc(100%+0.75rem)] z-30 w-52 rounded-2xl border border-white/15 bg-[#131318]/95 p-2 shadow-2xl shadow-black/50 backdrop-blur-xl" aria-label="Menu">
