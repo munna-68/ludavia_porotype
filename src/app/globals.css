@@ -1235,6 +1235,9 @@ html.light .onboarding-action:hover:not(:disabled) {
 }
 
 .snapshot-page {
+  --form-bg: var(--ink);
+  --form-text: var(--warm);
+  --form-muted: var(--muted);
   --snapshot-bg: var(--ink);
   position: relative;
   isolation: isolate;
@@ -1255,6 +1258,16 @@ html.light .onboarding-action:hover:not(:disabled) {
   color: rgba(255, 255, 255, 0.16);
   mask-image: linear-gradient(to bottom, black 0%, black 54%, transparent 92%);
   opacity: 0.65;
+}
+
+.snapshot-heading h1 {
+  font-size: clamp(2.75rem, 9vw, 4.75rem);
+}
+
+.snapshot-body .onboarding-action {
+  min-height: 4.25rem;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .snapshot-edit {

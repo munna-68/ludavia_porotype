@@ -88,8 +88,8 @@ export function ResultsShell() {
           </div>
         </header>
 
-        <div className="snapshot-body flex w-full max-w-[46rem] flex-1 flex-col px-5 pb-10 pt-10 sm:mx-auto sm:px-6 sm:pb-14 sm:pt-12">
-          <div className="onboarding-heading snapshot-heading mb-8 sm:mb-10">
+        <div className="snapshot-body flex w-full max-w-[46rem] flex-1 flex-col px-5 pb-10 pt-[clamp(2.75rem,6vh,4.5rem)] sm:mx-auto sm:px-6 sm:pb-14">
+          <div className="onboarding-heading snapshot-heading mb-[1.8rem]">
             <p className="onboarding-eyebrow text-violet-gradient">Review</p>
             <h1>
               <span className="onboarding-heading__line">Check your</span>
@@ -112,7 +112,7 @@ export function ResultsShell() {
                   <span className="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-white/50 sm:text-[0.68rem]">{label}</span>
                   <span className="min-w-0 truncate text-sm font-medium text-white sm:text-base">{display}</span>
                   <button type="button" className="snapshot-edit inline-flex items-center gap-1 text-xs font-semibold sm:text-sm" aria-label={`Edit ${label}`} onClick={() => router.push(`/form?step=${step + 1}`)}>
-                    <span className="text-violet-gradient">Edit</span>
+                    <span>Edit</span>
                     <ArrowRight className="h-4 w-4 text-white/55" aria-hidden="true" />
                   </button>
                 </div>
