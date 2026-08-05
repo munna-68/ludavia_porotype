@@ -37,12 +37,12 @@ export const businessTypeOptions: ReadonlyArray<FormOption> = [
 ];
 
 export const industryOptions: ReadonlyArray<FormOption> = [
-  { value: 'health', label: 'Health' },
-  { value: 'fintech', label: 'Fintech' },
-  { value: 'education', label: 'Education' },
-  { value: 'consumer', label: 'Consumer' },
-  { value: 'b2b-services', label: 'B2B services' },
-  { value: 'other', label: 'Other' },
+  { value: 'health', label: 'Health', description: 'Care, wellness, and life sciences.' },
+  { value: 'fintech', label: 'Fintech', description: 'Money, banking, and financial tools.' },
+  { value: 'education', label: 'Education', description: 'Learning, training, and schools.' },
+  { value: 'consumer', label: 'Consumer', description: 'Products for everyday customers.' },
+  { value: 'b2b-services', label: 'B2B services', description: 'Services built for other businesses.' },
+  { value: 'other', label: 'Other', description: 'Something outside these categories.' },
 ];
 
 export const stageOptions: ReadonlyArray<{ value: BusinessStage; label: string; description?: string }> = [

@@ -3,6 +3,7 @@
 import { useEffect, useId, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { DropdownMenu, DropdownMenuItem } from '@astryxdesign/core/DropdownMenu';
 import { SelectableCard } from '@astryxdesign/core/SelectableCard';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -10,16 +11,23 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
+  BriefcaseBusiness,
   Building2,
-  ChevronDown,
+  Check,
   CircleHelp,
+  Compass,
   DollarSign,
+  GraduationCap,
   Globe2,
+  HeartPulse,
   Handshake,
+  Landmark,
   Lightbulb,
   MapPin,
   Megaphone,
+  MessageSquareText,
   Plus,
+  ShoppingBag,
   Square,
   TrendingUp,
 } from 'lucide-react';
@@ -103,6 +111,22 @@ const mainGoalIcons: Record<string, LucideIcon> = {
   'hire-talent': Plus,
   'find-partners': Handshake,
   'expand-market': Globe2,
+};
+
+const industryIcons: Record<string, LucideIcon> = {
+  health: HeartPulse,
+  fintech: Landmark,
+  education: GraduationCap,
+  consumer: ShoppingBag,
+  'b2b-services': BriefcaseBusiness,
+  other: CircleHelp,
+};
+
+const helpNeededIcons: Record<string, LucideIcon> = {
+  introductions: Handshake,
+  'go-to-market': Megaphone,
+  'product-feedback': MessageSquareText,
+  'strategic-advice': Compass,
 };
 
 function getDraft(): { step: number; values: FormValues } | null {
@@ -356,6 +380,7 @@ export function BusinessNeedsForm({ initialStep = 0 }: { initialStep?: number })
                     options={industryOptions}
                     value={values.industry}
                     icon={Building2}
+                    optionIcons={industryIcons}
                     error={attempted ? errors.industry : undefined}
                     onChange={(value) => update('industry', value)}
                   />
@@ -402,9 +427,10 @@ export function BusinessNeedsForm({ initialStep = 0 }: { initialStep?: number })
                       label="Where do you need help?"
                       placeholder="Choose one"
                       options={helpNeededOptions}
-                      value={values.helpNeeded}
-                      icon={CircleHelp}
-                      error={attempted ? errors.helpNeeded : undefined}
+                        value={values.helpNeeded}
+                        icon={CircleHelp}
+                        optionIcons={helpNeededIcons}
+                        error={attempted ? errors.helpNeeded : undefined}
                       onChange={(value) => update('helpNeeded', value)}
                     />
                   </div>
@@ -519,10 +545,10 @@ type TextFieldProps = {
 
 function TextField({ id, label, placeholder, value, error, autoFocus, icon: Icon, onChange }: TextFieldProps) {
   return (
-    <label className="block" htmlFor={id}>
+    <label className="block" htmlFor={id} data-astryx-theme="neutral">
       <span className="sr-only">{label}</span>
       <span className="relative block">
-        {Icon ? <Icon className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-violet-bright" strokeWidth={1.5} aria-hidden="true" /> : null}
+        {Icon ? <Icon className="pointer-events-none absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-violet-bright" strokeWidth={1.5} aria-hidden="true" /> : null}
         <input id={id} className={cn('form-input rounded-2xl px-5 py-5 text-base sm:text-lg', Icon && 'pl-14')} value={value} placeholder={placeholder} autoFocus={autoFocus} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined} onChange={(event) => onChange(event.target.value)} />
       </span>
       {error ? <span id={`${id}-error`} className="mt-2 block text-sm text-rose-300" role="alert">{error}</span> : null}
@@ -538,23 +564,51 @@ type SelectFieldProps = {
   value: string;
   error?: string;
   icon: LucideIcon;
+  optionIcons?: Record<string, LucideIcon>;
   onChange: (value: string) => void;
 };
 
-function SelectField({ id, label, placeholder, options, value, error, icon: Icon, onChange }: SelectFieldProps) {
+function SelectField({ id, label, placeholder, options, value, error, icon: Icon, optionIcons, onChange }: SelectFieldProps) {
+  const selectedOption = options.find((option) => option.value === value);
+  const SelectedIcon = selectedOption ? optionIcons?.[selectedOption.value] ?? Icon : Icon;
+
   return (
-    <label className="block" htmlFor={id}>
+    <div className="block" data-astryx-theme="neutral">
       <span className="sr-only">{label}</span>
       <span className="relative block">
-        <Icon className="pointer-events-none absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-violet-bright" strokeWidth={1.5} aria-hidden="true" />
-        <select id={id} className="form-select appearance-none rounded-2xl px-5 py-5 pl-14 pr-12 text-base text-white sm:text-lg" value={value} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined} onChange={(event) => onChange(event.target.value)}>
-          <option value="" disabled>{placeholder}</option>
-          {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-        </select>
-        <ChevronDown className="pointer-events-none absolute right-5 top-1/2 h-5 w-5 -translate-y-1/2 text-white/75" aria-hidden="true" />
+        <DropdownMenu
+          button={{
+            id,
+            label: selectedOption?.label ?? placeholder,
+            icon: SelectedIcon ? <SelectedIcon aria-hidden="true" className="form-select-trigger__icon" strokeWidth={1.5} /> : undefined,
+            variant: 'ghost',
+            size: 'lg',
+            width: '100%',
+            className: 'form-select-trigger',
+            'aria-label': `${label}: ${selectedOption?.label ?? placeholder}`,
+            'aria-describedby': error ? `${id}-error` : undefined,
+            'aria-invalid': Boolean(error),
+          }}
+        >
+          {options.map((option) => {
+            const OptionIcon = optionIcons?.[option.value];
+
+            return (
+              <DropdownMenuItem
+                key={option.value}
+                className="form-select-menu__item"
+                icon={OptionIcon}
+                label={option.label}
+                description={option.description ? <span className="form-select-menu__description">{option.description}</span> : undefined}
+                endContent={option.value === value ? <Check className="form-select-menu__check" aria-hidden="true" /> : undefined}
+                onClick={() => onChange(option.value)}
+              />
+            );
+          })}
+        </DropdownMenu>
       </span>
       {error ? <span id={`${id}-error`} className="mt-2 block text-sm text-rose-300" role="alert">{error}</span> : null}
-    </label>
+    </div>
   );
 }
 

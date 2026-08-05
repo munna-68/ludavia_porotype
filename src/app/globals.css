@@ -1,5 +1,6 @@
 @import "@astryxdesign/core/reset.css";
 @import "@astryxdesign/core/astryx.css";
+@import "@astryxdesign/theme-neutral/theme.css";
 @import "../lib/ludavia.css";
 @import "tailwindcss";
 
@@ -739,24 +740,23 @@ select {
 .onboarding-action {
   display: flex;
   width: 100%;
-  min-height: 4.25rem;
+  min-height: 4.5rem;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0 1rem 0 1.35rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.045);
+  padding: 0 1.25rem 0 1.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: rgba(6, 6, 7, 0.9);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 1rem 2.5rem rgba(0, 0, 0, 0.12);
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 1.5rem 4rem rgba(0, 0, 0, 0.22);
   color: var(--form-text);
   cursor: pointer;
-  font-size: 1.05rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   text-align: left;
-  -webkit-backdrop-filter: blur(1.25rem);
-  backdrop-filter: blur(1.25rem);
   transition:
     border-color 220ms ease,
     background-color 220ms ease,
@@ -764,8 +764,8 @@ select {
 }
 
 .onboarding-action:hover:not(:disabled) {
-  border-color: rgba(255, 255, 255, 0.34);
-  background: rgba(255, 255, 255, 0.075);
+  border-color: rgba(255, 255, 255, 0.65);
+  background: rgba(10, 10, 12, 0.94);
   transform: translateY(-0.125rem);
 }
 
@@ -780,23 +780,17 @@ select {
 
 .onboarding-action__arrow {
   display: inline-flex;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(164, 109, 255, 0.6);
-  border-radius: 999px;
-  background: rgba(164, 109, 255, 0.16);
-  color: var(--violet-bright);
-  transition:
-    background-color 220ms ease,
-    transform 220ms ease;
+  color: var(--form-text);
+  transition: transform 220ms ease;
 }
 
 .onboarding-action:hover:not(:disabled) .onboarding-action__arrow {
-  background: rgba(164, 109, 255, 0.26);
-  transform: translateX(0.2rem);
+  transform: translateX(0.35rem);
 }
 
 .onboarding-action__arrow svg {
@@ -898,6 +892,18 @@ html.light .onboarding-back {
   background: rgba(36, 25, 43, 0.02);
 }
 
+html.light .onboarding-action {
+  border-color: var(--line-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 1.5rem 4rem rgba(45, 32, 52, 0.09);
+}
+
+html.light .onboarding-action:hover:not(:disabled) {
+  border-color: rgba(36, 25, 43, 0.42);
+  background: rgba(36, 25, 43, 0.045);
+}
+
 @media (max-width: 52rem) {
   .form-globe-stage {
     top: 4.5rem;
@@ -979,13 +985,13 @@ html.light .onboarding-back {
   }
 
   .onboarding-action {
-    min-height: 4.2rem;
-    padding-left: 1.25rem;
+    min-height: 4rem;
+    padding-inline: 1.25rem;
   }
 
   .onboarding-action__arrow {
-    width: 2.55rem;
-    height: 2.55rem;
+    width: 2.5rem;
+    height: 2.5rem;
   }
 
   .onboarding-panel__footer {
@@ -996,6 +1002,96 @@ html.light .onboarding-back {
 
 .menu-popover {
   animation: menu-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.form-select-trigger {
+  display: flex;
+  width: 100%;
+  min-height: 4.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.045);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1rem 2.5rem rgba(0, 0, 0, 0.1);
+  color: var(--form-text);
+  font-size: 1rem;
+  justify-content: flex-start;
+  text-align: left;
+  transition:
+    border-color 220ms ease,
+    background-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.form-select-trigger > span:first-child > span:nth-child(2) {
+  margin-left: 0.75rem;
+}
+
+.form-select-trigger > span:first-child > span:nth-child(3) {
+  margin-left: auto;
+}
+
+.form-select-trigger:hover {
+  border-color: rgba(255, 255, 255, 0.34);
+  background: rgba(255, 255, 255, 0.075);
+}
+
+.form-select-trigger:focus,
+.form-select-trigger[aria-expanded="true"] {
+  border-color: rgba(164, 109, 255, 0.8);
+  background: rgba(164, 109, 255, 0.09);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 0 0.2rem rgba(164, 109, 255, 0.12),
+    0 1rem 2.5rem rgba(0, 0, 0, 0.12);
+}
+
+.form-select-trigger__icon {
+  color: var(--violet-bright);
+}
+
+.form-select-menu__check {
+  width: 1rem;
+  height: 1rem;
+  color: var(--violet-bright);
+}
+
+.form-select-menu {
+  overflow: hidden;
+  padding: 0.35rem;
+  border: 1px solid var(--color-border-emphasized);
+  border-radius: 0.9rem;
+  background: var(--color-background-surface);
+  box-shadow:
+    0 1.5rem 3.5rem rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.form-select-menu__item {
+  min-height: 3.35rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.7rem;
+  transition: background-color 160ms ease;
+}
+
+.form-select-menu__item:hover,
+.form-select-menu__item:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.form-select-menu__item svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.form-select-menu__description {
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 0.78rem;
 }
 
 .form-input,
@@ -1025,6 +1121,7 @@ html.light .onboarding-back {
 
 .form-input:focus,
 .form-select:focus,
+.form-select-trigger:focus,
 .form-textarea:focus {
   border-color: rgba(164, 109, 255, 0.8);
   background: rgba(164, 109, 255, 0.09);
@@ -1204,16 +1301,31 @@ html.light .form-dot-pattern {
 
 html.light .form-input,
 html.light .form-select,
+html.light .form-select-trigger,
 html.light .form-textarea {
   background: rgba(20, 18, 24, 0.025);
 }
 
 html.light .form-page .form-input,
 html.light .form-page .form-select,
+html.light .form-page .form-select-trigger,
 html.light .form-page .form-textarea {
   border-color: var(--line);
   background: rgba(20, 18, 24, 0.025);
   color: var(--form-text);
+}
+
+html.light .form-select-trigger:hover {
+  background: rgba(20, 18, 24, 0.05);
+}
+
+html.light .form-select-menu__item:hover,
+html.light .form-select-menu__item:focus-visible {
+  background: rgba(20, 18, 24, 0.06);
+}
+
+html.light .form-select-menu__description {
+  color: var(--muted);
 }
 
 html.light .choice-card {
