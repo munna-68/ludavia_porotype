@@ -621,11 +621,11 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
 - [ ] No additional records, search UI, or data-fetching layer exists.
 - [ ] `npm run lint`, `npm run typecheck`, and `npm run build` succeed.
 
-**Status: NOT STARTED**
+**Status: COMPLETED**
 
 **Model Tier: Low**
 
-**Verification Notes:** Not verified.
+**Verification Notes:** Completed: 2026-08-05 — Created `src/data/sample-opportunity.ts` (fictional Harborline Labs "Founder Pilot Cohort", type `pilot`, scope/timeframe, personalized `whyItFits` with `{{industry}}`/`{{location}}`/`{{stage}}`/`{{goal}}` tokens, `ctaLabel`, `illustrativeLabel`), `src/data/sample-connection.ts` (fictional Amara Chen at Northstar Partners with role, location, `mutualContext` including `{{businessName}}`, expertise tags, personalized `whyConnect`, `illustrativeLabel`), and `src/lib/personalize.ts` — a pure token replacer that resolves `{{field}}` tokens through `labelForField` (option values render as labels, e.g. `raise-capital` → "Raise capital"), supports alias tokens (`goal` → `mainGoal`, `sector` → `industry`), and substitutes readable fallback phrases when a value is absent so no `{{...}}` token survives. Verified with a throwaway `tsx` script against the real modules: full `BusinessNeedsInput` resolves every token (e.g. "…focused on Raise capital…", "…early-stage Fintech companies building in Lisbon."); partial input leaves zero unresolved tokens and reads sensibly ("your sector", "your market", "current stage"). No real orgs, awards, deadlines, fake traction, match scores, or application links; exactly one opportunity and one connection; no search/browse/database layer. `npm run lint`, `npm run typecheck`, and `npm run build` all pass.
 
 ---
 
