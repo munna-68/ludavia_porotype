@@ -1,22 +1,22 @@
 'use client';
 
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import type { ReactElement } from 'react';
+import type { CSSProperties, ReactElement } from 'react';
+import { useRouter } from 'next/navigation';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
+import { Banner } from '@astryxdesign/core/Banner';
 import { TextInput } from '@astryxdesign/core/TextInput';
-import { TextArea } from '@astryxdesign/core/TextArea';
 import { Selector } from '@astryxdesign/core/Selector';
 import { SelectableCard } from '@astryxdesign/core/SelectableCard';
 import { FieldStatus } from '@astryxdesign/core/FieldStatus';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
-import { Grid } from '@astryxdesign/core/Grid';
-import { GridSpan } from '@astryxdesign/core/Grid';
 import { normalizeBusinessNeeds } from '@/lib/business-needs-schema';
-import { loadBusinessNeeds } from '@/lib/session-store';
+import { loadBusinessNeeds, saveBusinessNeeds } from '@/lib/session-store';
 import type { BusinessNeedsInput, BusinessStage } from '@/lib/types';
+import { GlobeVisual } from '@/components/motion/globe-visual';
 import {
   businessTypeOptions,
   helpNeededOptions,
@@ -171,18 +171,16 @@ const STEP_FIELDS: (keyof Values)[][] = [
   ['industry', 'location'],
   ['stage'],
   ['mainGoal', 'helpNeeded'],
-  ['description'],
   [],
 ];
 
 const STEP_META = [
-  { eyebrow: 'Start', question: 'What should we call your business?', hint: 'Your business name sets the stage. You can change it later.' },
-  { eyebrow: 'About', question: 'What best describes your business?', hint: 'Pick the one that feels closest.' },
-  { eyebrow: 'Market', question: 'Where do you operate?', hint: 'Your sector and the place you call home.' },
-  { eyebrow: 'Stage', question: 'How far along is your business?', hint: 'There is no wrong answer — we meet you where you are.' },
-  { eyebrow: 'Goal', question: 'What are you working toward right now?', hint: 'Your headline aim, and the help that would move the needle.' },
-  { eyebrow: 'Context', question: 'Anything else we should know?', hint: 'Optional. A line or two can sharpen your growth snapshot.' },
-  { eyebrow: 'Review', question: 'Review your details', hint: 'Make sure everything looks right, then see your opportunities.' },
+  { eyebrow: 'Start', question: 'What should we call your business?', hint: 'A name gives the snapshot somewhere to begin.' },
+  { eyebrow: 'Model', question: 'What kind of business is it?', hint: 'Choose the closest fit. Nothing is permanent.' },
+  { eyebrow: 'Market', question: 'Where do you operate?', hint: 'Tell us your sector and where you call home.' },
+  { eyebrow: 'Stage', question: 'Where are you in the journey?', hint: 'Meet the business where it is today.' },
+  { eyebrow: 'Focus', question: 'What would move it forward?', hint: 'Pick the goal and kind of support that matters most.' },
+  { eyebrow: 'Review', question: 'Check your snapshot.', hint: 'One last look before we map the next step.' },
 ] as const;
 
 const EMPTY_VALUES: Values = {
@@ -195,8 +193,6 @@ const EMPTY_VALUES: Values = {
   helpNeeded: '',
   description: '',
 };
-
-const DESCRIPTION_LIMIT = 500;
 
 function getDraft(): { step: number; values: Values } | null {
   try {
@@ -239,19 +235,18 @@ function focusFirstInvalid(field: keyof Values) {
   wrapper.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
-export type BusinessNeedsFormProps = {
-  onSubmit?: (values: Values) => void;
-};
-
-export function BusinessNeedsForm({ onSubmit }: BusinessNeedsFormProps) {
+export function BusinessNeedsForm() {
+  const router = useRouter();
   const [hydrated, setHydrated] = useState(false);
   const [step, setStep] = useState(0);
   const [values, setValues] = useState<Values>(EMPTY_VALUES);
   const [errors, setErrors] = useState<Partial<Record<keyof Values, string>>>({});
   const [attempted, setAttempted] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [storageError, setStorageError] = useState<string | null>(null);
   const progressId = useId();
 
-  const stageRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLElement>(null);
 
   const totalSteps = STEP_FIELDS.length;
 
@@ -292,6 +287,7 @@ export function BusinessNeedsForm({ onSubmit }: BusinessNeedsFormProps) {
   function update<K extends keyof Values>(field: K, value: Values[K]) {
     setValues((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
+    if (storageError) setStorageError(null);
   }
 
   function validateCurrentStep(): boolean {
@@ -324,12 +320,6 @@ export function BusinessNeedsForm({ onSubmit }: BusinessNeedsFormProps) {
     requestAnimationFrame(() => stageRef.current?.scrollTo({ top: 0, behavior: 'smooth' }));
   }
 
-  function goBack() {
-    setAttempted(false);
-    setErrors({});
-    setStep((s) => Math.max(s - 1, 0));
-  }
-
   function goToStep(target: number) {
     setAttempted(false);
     setErrors({});
@@ -337,6 +327,7 @@ export function BusinessNeedsForm({ onSubmit }: BusinessNeedsFormProps) {
   }
 
   function handleSubmit() {
+    if (isNavigating) return;
     const result = normalizeBusinessNeeds(values);
     if (!result.success) {
       const fieldOrder: (keyof Values)[] = ['businessName', 'businessType', 'industry', 'location', 'stage', 'mainGoal', 'helpNeeded'];
@@ -358,197 +349,195 @@ export function BusinessNeedsForm({ onSubmit }: BusinessNeedsFormProps) {
       return;
     }
     clearDraft();
-    onSubmit?.(result.data as Values);
+    const saved = saveBusinessNeeds(result.data);
+    if (!saved) {
+      setStorageError('Your snapshot could not be saved in this browser. Your answers are still here — try again.');
+      return;
+    }
+    setStorageError(null);
+    setIsNavigating(true);
+    router.push('/results');
   }
 
   const meta = STEP_META[step];
   const isLast = step === totalSteps - 1;
-  const isFirst = step === 0;
-  const progress = Math.round((step / (totalSteps - 1)) * 100);
+  const progress = Math.round(((step + 1) / totalSteps) * 100);
 
   return (
     <main className="form-wizard" aria-labelledby={progressId}>
-      <VStack gap={2} className="form-wizard__progress">
-        <HStack hAlign="between" vAlign="center" className="form-wizard__progress-head">
+      <GlobeVisual className="form-wizard__globe" />
+
+      <section className="form-wizard__layout">
+        <header className="form-wizard__topline">
           <Text type="label" color="accent">
             {meta.eyebrow}
           </Text>
-          <Text type="label" color="secondary">
-            Step {step + 1} / {totalSteps}
-          </Text>
-        </HStack>
-        <div className="form-wizard__track" role="progressbar" aria-valuenow={step + 1} aria-valuemin={1} aria-valuemax={totalSteps} aria-label="Form progress">
-          <span className="form-wizard__track-fill" style={{ width: `${progress}%` }} />
-        </div>
-      </VStack>
+        </header>
 
-      <div className="form-wizard__stage" ref={stageRef} tabIndex={-1}>
-        <div key={step} className="form-wizard__step" data-step={step}>
-          <header className="form-wizard__intro">
-            <Heading level={1} id={progressId} className="form-wizard__question" textWrap="balance">
-              {meta.question}
-            </Heading>
-            <Text as="p" type="large" color="secondary" className="form-wizard__hint" textWrap="balance">
-              {meta.hint}
-            </Text>
-          </header>
+        {storageError ? (
+          <section className="form-wizard__storage-error">
+            <Banner status="error" title="Couldn't save your snapshot" description={storageError} container="card" />
+          </section>
+        ) : null}
 
-          <fieldset className="form-wizard__fields">
-            <legend className="form-wizard__sr-only">{meta.question}</legend>
+        <section className="form-wizard__stage" ref={stageRef} tabIndex={-1}>
+          <article key={step} className="form-wizard__step" data-step={step}>
+            <header className="form-wizard__intro">
+              <Heading level={1} id={progressId} className="form-wizard__question" textWrap="balance">
+                {meta.question}
+              </Heading>
+              <Text as="p" type="large" color="secondary" className="form-wizard__hint" textWrap="balance">
+                {meta.hint}
+              </Text>
+            </header>
 
-            {step === 0 && (
-              <div data-field="businessName">
-                <TextInput
-                  label="Business name"
-                  isLabelHidden
-                  size="lg"
-                  value={values.businessName}
-                  placeholder="e.g. Halcyon Studio"
-                  hasAutoFocus
-                  hasClear
-                  status={visibleErrors.businessName ? { type: 'error', message: visibleErrors.businessName } : undefined}
-                  statusVariant="attached"
-                  onChange={(v) => update('businessName', v)}
-                  onEnter={goNext}
-                />
-              </div>
-            )}
+            <fieldset className="form-wizard__fields">
+              <legend className="form-wizard__sr-only">{meta.question}</legend>
 
-            {step === 1 && (
-              <OptionGrid
-                field="businessType"
-                ariaLabel="Business type"
-                options={businessTypeOptions}
-                value={values.businessType}
-                onSelect={(v) => update('businessType', v)}
-                renderIcon={(value) => {
-                  const Icon = businessTypeIcons[value];
-                  return Icon ? <Icon className="option-card__icon" /> : null;
-                }}
-                error={visibleErrors.businessType}
-              />
-            )}
-
-            {step === 2 && (
-              <VStack gap={4} data-field="industry-location">
-                <span data-field="industry">
-                  <Selector
-                    label="Sector"
-                    placeholder="Choose a sector"
-                    size="lg"
-                    hasSearch
-                    searchPlaceholder="Search sectors…"
-                    value={values.industry}
-                    options={industryOptions.map((o) => ({ value: o.value, label: o.label }))}
-                    onChange={(v) => update('industry', v)}
-                    status={visibleErrors.industry ? { type: 'error', message: visibleErrors.industry } : undefined}
-                  />
-                </span>
-                <span data-field="location">
+              {step === 0 && (
+                <section data-field="businessName">
                   <TextInput
-                    label="Location"
+                    label="Business name"
+                    isLabelHidden
                     size="lg"
-                    value={values.location}
-                    placeholder="City, region, or country"
+                    value={values.businessName}
+                    placeholder="e.g. Halcyon Studio"
+                    hasAutoFocus
                     hasClear
-                    status={visibleErrors.location ? { type: 'error', message: visibleErrors.location } : undefined}
+                    status={visibleErrors.businessName ? { type: 'error', message: visibleErrors.businessName } : undefined}
                     statusVariant="attached"
-                    onChange={(v) => update('location', v)}
+                    onChange={(v) => update('businessName', v)}
                     onEnter={goNext}
                   />
-                </span>
-              </VStack>
-            )}
+                </section>
+              )}
 
-            {step === 3 && (
-              <OptionGrid
-                field="stage"
-                ariaLabel="Business stage"
-                options={stageOptions}
-                value={values.stage}
-                onSelect={(v) => update('stage', v as BusinessStage)}
-                renderIcon={(value) => {
-                  const Icon = stageIcons[value as BusinessStage];
-                  return Icon ? <Icon className="option-card__icon" /> : null;
-                }}
-                minColWidth={200}
-                error={visibleErrors.stage}
-              />
-            )}
-
-            {step === 4 && (
-              <VStack gap={5}>
+              {step === 1 && (
                 <OptionGrid
-                  field="mainGoal"
-                  ariaLabel="Main goal"
-                  options={mainGoalOptions}
-                  value={values.mainGoal}
-                  onSelect={(v) => update('mainGoal', v)}
+                  field="businessType"
+                  ariaLabel="Business type"
+                  options={businessTypeOptions}
+                  value={values.businessType}
+                  onSelect={(v) => update('businessType', v)}
                   renderIcon={(value) => {
-                    const Icon = mainGoalIcons[value];
+                    const Icon = businessTypeIcons[value];
                     return Icon ? <Icon className="option-card__icon" /> : null;
                   }}
-                  minColWidth={200}
-                  error={visibleErrors.mainGoal}
+                  error={visibleErrors.businessType}
                 />
-                <span data-field="helpNeeded">
-                  <Selector
-                    label="Where do you need help?"
-                    placeholder="Choose one"
-                    size="lg"
-                    hasSearch
-                    searchPlaceholder="Search…"
-                    value={values.helpNeeded}
-                    options={helpNeededOptions.map((o) => ({ value: o.value, label: o.label }))}
-                    onChange={(v) => update('helpNeeded', v)}
-                    status={visibleErrors.helpNeeded ? { type: 'error', message: visibleErrors.helpNeeded } : undefined}
+              )}
+
+              {step === 2 && (
+                <VStack gap={4} data-field="industry-location">
+                  <section data-field="industry">
+                    <Selector
+                      label="Sector"
+                      placeholder="Choose a sector"
+                      size="lg"
+                      hasSearch
+                      searchPlaceholder="Search sectors..."
+                      value={values.industry}
+                      options={industryOptions.map((o) => ({ value: o.value, label: o.label }))}
+                      onChange={(v) => update('industry', v)}
+                      status={visibleErrors.industry ? { type: 'error', message: visibleErrors.industry } : undefined}
+                    />
+                  </section>
+                  <section data-field="location">
+                    <TextInput
+                      label="Location"
+                      size="lg"
+                      value={values.location}
+                      placeholder="City, region, or country"
+                      hasClear
+                      status={visibleErrors.location ? { type: 'error', message: visibleErrors.location } : undefined}
+                      statusVariant="attached"
+                      onChange={(v) => update('location', v)}
+                      onEnter={goNext}
+                    />
+                  </section>
+                </VStack>
+              )}
+
+              {step === 3 && (
+                <OptionGrid
+                  field="stage"
+                  ariaLabel="Business stage"
+                  options={stageOptions}
+                  value={values.stage}
+                  onSelect={(v) => update('stage', v as BusinessStage)}
+                  renderIcon={(value) => {
+                    const Icon = stageIcons[value as BusinessStage];
+                    return Icon ? <Icon className="option-card__icon" /> : null;
+                  }}
+                  error={visibleErrors.stage}
+                />
+              )}
+
+              {step === 4 && (
+                <VStack gap={5}>
+                  <OptionGrid
+                    field="mainGoal"
+                    ariaLabel="Main goal"
+                    options={mainGoalOptions}
+                    value={values.mainGoal}
+                    onSelect={(v) => update('mainGoal', v)}
+                    renderIcon={(value) => {
+                      const Icon = mainGoalIcons[value];
+                      return Icon ? <Icon className="option-card__icon" /> : null;
+                    }}
+                    error={visibleErrors.mainGoal}
                   />
-                </span>
-              </VStack>
-            )}
+                  <section data-field="helpNeeded">
+                    <Selector
+                      label="Where do you need help?"
+                      placeholder="Choose one"
+                      size="lg"
+                      hasSearch
+                      searchPlaceholder="Search..."
+                      value={values.helpNeeded}
+                      options={helpNeededOptions.map((o) => ({ value: o.value, label: o.label }))}
+                      onChange={(v) => update('helpNeeded', v)}
+                      status={visibleErrors.helpNeeded ? { type: 'error', message: visibleErrors.helpNeeded } : undefined}
+                    />
+                  </section>
+                </VStack>
+              )}
 
-            {step === 5 && (
-              <div data-field="description">
-                <TextArea
-                  label="Anything else?"
-                  isLabelHidden
-                  size="lg"
-                  rows={4}
-                  maxLength={DESCRIPTION_LIMIT}
-                  value={values.description ?? ''}
-                  placeholder="A sentence on what makes your business unique, what you are stuck on, or who your customer is."
-                  onChange={(v) => update('description', v.slice(0, DESCRIPTION_LIMIT))}
-                  width="100%"
-                />
-              </div>
-            )}
+              {isLast && <ReviewSummary values={values} onEdit={goToStep} />}
+            </fieldset>
 
-            {step === 6 && (
-              <ReviewSummary values={values} onEdit={goToStep} />
-            )}
-          </fieldset>
-
-          {!isLast && (
-            <nav className="form-wizard__actions" aria-label="Step navigation">
+            <nav className="form-wizard__actions" aria-label={isLast ? 'Submit navigation' : 'Step navigation'}>
               <Button
-                variant="ghost"
+                variant="primary"
                 size="lg"
-                label="Back"
-                isDisabled={isFirst}
-                onClick={goBack}
+                label={isLast ? 'See opportunities' : 'Continue'}
+                className="form-wizard__continue"
+                isLoading={isNavigating}
+                onClick={isLast ? handleSubmit : goNext}
+                endContent={
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M5 12h13M13 6l6 6-6 6" />
+                  </svg>
+                }
               />
-              <Button variant="primary" size="lg" label="Continue" onClick={goNext} />
             </nav>
-          )}
+          </article>
+        </section>
+      </section>
 
-          {isLast && (
-            <nav className="form-wizard__actions" aria-label="Submit navigation">
-              <Button variant="ghost" size="lg" label="Back" onClick={goBack} />
-              <Button variant="primary" size="lg" label="See opportunities" onClick={handleSubmit} />
-            </nav>
-          )}
-        </div>
-      </div>
+      <footer className="form-wizard__dock" aria-label="Journey progress">
+        <HStack hAlign="between" vAlign="center" className="form-wizard__dock-head">
+          <Text type="label" color="secondary">
+            Journey
+          </Text>
+          <Text type="label" color="primary">
+            {progress}%
+          </Text>
+        </HStack>
+        <progress className="form-wizard__progress-bar" value={progress} max="100" aria-label={`Journey progress: ${progress}%`}>
+          {progress}%
+        </progress>
+      </footer>
     </main>
   );
 }
@@ -560,50 +549,53 @@ type OptionGridProps = {
   value: string;
   onSelect: (value: string) => void;
   renderIcon: (value: string) => React.ReactNode;
-  minColWidth?: number;
   error?: string;
 };
 
-function OptionGrid({ field, ariaLabel, options, value, onSelect, renderIcon, minColWidth = 220, error }: OptionGridProps) {
+function OptionGrid({ field, ariaLabel, options, value, onSelect, renderIcon, error }: OptionGridProps) {
   return (
     <VStack gap={3} data-field={field} role="group" aria-label={ariaLabel}>
-      <Grid columns={{ minWidth: minColWidth }} gap={3} align="stretch">
-        {options.map((option) => {
+      <VStack gap={2} className="option-list">
+        {options.map((option, index) => {
           const selected = value === option.value;
-          const card = (
-            <SelectableCard
+          return (
+            <article
+              className="option-card"
               key={option.value}
-              label={option.label}
-              isSelected={selected}
-              onChange={(isSelected) => {
-                if (isSelected) onSelect(option.value);
-              }}
-              variant="default"
-              padding={0}
+              style={{ '--option-index': index } as CSSProperties}
             >
-              <span className="option-card__body">
-                {renderIcon(option.value)}
-                <span className="option-card__text">
-                  <Text type="body" weight="medium" className="option-card__label">
-                    {option.label}
-                  </Text>
-                  {option.description ? (
-                    <Text type="supporting" className="option-card__desc" textWrap="balance">
-                      {option.description}
+              <SelectableCard
+                label={option.label}
+                isSelected={selected}
+                onChange={(isSelected) => {
+                  if (isSelected) onSelect(option.value);
+                }}
+                variant="transparent"
+                padding={0}
+              >
+                <section className="option-card__body">
+                  {renderIcon(option.value)}
+                  <section className="option-card__text">
+                    <Text type="body" weight="medium" className="option-card__label">
+                      {option.label}
                     </Text>
-                  ) : null}
-                </span>
-                <span className="option-card__check" aria-hidden="true">
-                  <svg {...iconProps}>
-                    <path d="m5 12 4 4 10-10" />
-                  </svg>
-                </span>
-              </span>
-            </SelectableCard>
+                    {option.description ? (
+                      <Text type="supporting" className="option-card__desc" textWrap="balance">
+                        {option.description}
+                      </Text>
+                    ) : null}
+                  </section>
+                  <i className="option-card__check" aria-hidden="true">
+                    <svg {...iconProps}>
+                      <path d="m5 12 4 4 10-10" />
+                    </svg>
+                  </i>
+                </section>
+              </SelectableCard>
+            </article>
           );
-          return option.isFull ? <GridSpan key={option.value} columns="full">{card}</GridSpan> : card;
         })}
-      </Grid>
+      </VStack>
       {error ? <FieldStatus type="error" message={error} variant="detached" /> : null}
     </VStack>
   );
@@ -622,34 +614,27 @@ const REVIEW_ROWS: Array<{ field: keyof Values; label: string; step: number; opt
   { field: 'stage', label: 'Stage', step: 3 },
   { field: 'mainGoal', label: 'Main goal', step: 4 },
   { field: 'helpNeeded', label: 'Help needed', step: 4 },
-  { field: 'description', label: 'Notes', step: 5, optional: true },
 ];
 
 function ReviewSummary({ values, onEdit }: ReviewSummaryProps) {
   return (
-    <dl className="review">
+    <ul className="review">
       {REVIEW_ROWS.map((row) => {
         const raw = values[row.field];
-        const display =
-          row.field === 'description'
-            ? raw && raw.trim() ? raw : 'Not provided'
-            : labelForField(row.field, typeof raw === 'string' ? raw : undefined) || 'Not provided';
+        const display = labelForField(row.field, typeof raw === 'string' ? raw : undefined) || 'Not provided';
         const isPlaceholder = display === 'Not provided';
         return (
-          <div className="review__row" key={row.field}>
-            <div className="review__label">
-              <Text type="label" color="secondary">
-                {row.label}
-              </Text>
-              {row.optional ? <Text type="label" color="disabled">Optional</Text> : null}
-            </div>
-            <Text as="div" type="body" color={isPlaceholder ? 'disabled' : 'primary'} className="review__value" textWrap="balance">
+          <li className="review__row" key={row.field}>
+            <Text as="p" type="label" color="secondary" className="review__label">
+              {row.label}
+            </Text>
+            <Text as="p" type="body" color={isPlaceholder ? 'disabled' : 'primary'} className="review__value" textWrap="balance">
               {display}
             </Text>
             <Button variant="ghost" size="sm" label="Edit" onClick={() => onEdit(row.step)} className="review__edit" />
-          </div>
+          </li>
         );
       })}
-    </dl>
+    </ul>
   );
 }

@@ -557,6 +557,8 @@ Completed: 2026-08-05 — Stage 2 verified: (1) Installed `@astryxdesign/core@0.
 
 **Verification Notes:** Completed: 2026-08-05 — Built the user-requested mobile-first seven-step onboarding wizard using Astryx `TextInput`, `TextArea`, `Selector`, `SelectableCard`, `Grid`, `VStack`, `HStack`, `Button`, and `FieldStatus`. Verified required-field validation with first-invalid focus, responsive option grids, visible 500-character description limit, review/edit step, sessionStorage prefill, local draft recovery, keyboard-safe controls, zero horizontal overflow at 390x844 and 1280x800, dark/light theme rendering, and no browser errors in Chromium. `npm run lint`, `npm run typecheck`, and `npm run build` pass. Intentional deviation: user explicitly requested a premium next/next wizard, so this replaces the plan's original single-page form direction; Stage 9 still owns final persistence/navigation wiring. Stage 5 remains independently BLOCKED for the missing approved logo variant.
 
+UI redesign update: 2026-08-05 — Removed the optional Context step and dead Back control, converted option grids into a sequential animated list, moved progress into a fixed bottom dock, added the local globe visual, and replaced the hamburger menu with the direct animated theme toggle. Rechecked the responsive layout at 390x844 and 1280x800 in dark mode; the form remains token-backed and Astryx-based.
+
 ---
 
 ## Stage 9 — Form validation + navigate to results
@@ -586,11 +588,11 @@ Completed: 2026-08-05 — Stage 2 verified: (1) Installed `@astryxdesign/core@0.
 - [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**
+**Status: COMPLETED**
 
 **Model Tier: Low**
 
-**Verification Notes:** Not verified.
+**Verification Notes:** Completed: 2026-08-05 — Submit now runs the shared `normalizeBusinessNeeds` validator (no duplicated rules in JSX), shows inline `FieldStatus` errors, focuses the first invalid field, keeps user values on failure, and jumps to the step containing the first invalid field when the review step is submitted. On success it calls `saveBusinessNeeds(normalizedData)`, clears the local draft, disables the submit action while navigation is pending via Astryx `Button isLoading` (spinner + disabled — prevents duplicate transitions), then `router.push('/results')` via `next/navigation`. If the sessionStorage write fails, a recoverable Astryx `Banner` (status error) is shown inside the form column, the user stays on the form, and the error clears on the next successful submit or when values are edited. Added a harmless static `/results` placeholder page (`src/app/results/page.tsx`) as the navigation destination; the client `ResultsSessionGate` and cold-tab redirect remain Stage 11. Verified in headless Chrome (CDP) at 1280x800 and 390x844: empty submit shows errors and does not navigate; valid submit persists `ludavia-business-needs:v1` and lands on `/results`; no duplicate navigation on rapid double-click (button enters loading state); browser console has no errors. `npm run lint`, `npm run typecheck`, and `npm run build` all pass.
 
 ---
 

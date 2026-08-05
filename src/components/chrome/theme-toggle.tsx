@@ -10,16 +10,15 @@ export function ThemeToggle() {
     <button
       type="button"
       className="theme-toggle"
+      data-mode={mode}
       aria-label={`Switch to ${nextMode} mode`}
+      title={`Switch to ${nextMode} mode`}
       onClick={() => setMode(nextMode)}
     >
-      {mode === 'dark' ? 'Light mode' : 'Dark mode'}
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        {mode === 'dark' ? (
-          <path d="M12 4v2M12 18v2M4 12h2M18 12h2M6.35 6.35l1.4 1.4M16.25 16.25l1.4 1.4M17.65 6.35l-1.4 1.4M7.75 16.25l-1.4 1.4M15.5 12a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" />
-        ) : (
-          <path d="M19 15.5A7.5 7.5 0 0 1 8.5 5 7.5 7.5 0 1 0 19 15.5Z" />
-        )}
+        <circle className="theme-toggle__sun" cx="12" cy="12" r="3.5" />
+        <path className="theme-toggle__rays" d="M12 2.75v2M12 19.25v2M2.75 12h2M19.25 12h2M5.47 5.47l1.42 1.42M17.11 17.11l1.42 1.42M18.53 5.47l-1.42 1.42M6.89 17.11l-1.42 1.42" />
+        <path className="theme-toggle__moon" d="M19.2 15.25A7.5 7.5 0 0 1 8.75 4.8a7.5 7.5 0 1 0 10.45 10.45Z" />
       </svg>
     </button>
   );
