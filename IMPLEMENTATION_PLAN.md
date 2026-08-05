@@ -84,6 +84,38 @@ Every stage must leave one concise verification note beside its status. For UI s
 
 ---
 
+## Magic UI Integration Note
+
+**Root cause found:** Magic UI was never set up as a registry integration during the initial scaffold. Stage 1 correctly made Astryx the primary design system and allowed third-party libraries only as isolated additions, but it did not document the separate Magic UI registry workflow or the boundary between an official registry component and a local recreation.
+
+The resulting failure mode was:
+
+- There was no `components.json` shadcn registry configuration.
+- There were no dependencies required by the official Globe component: `cobe` and `motion`.
+- Files under `src/components/magicui/` were treated as proof that Magic UI was installed, even though they were custom local implementations.
+- The previous globe used an SVG and `framer-motion`; it was not the official WebGL/Cobe globe from Magic UI.
+- Agents avoided `npx shadcn@latest init` because this app already uses Astryx and an unreviewed shadcn initialization could overwrite `globals.css`, `layout.tsx`, or theme wiring. That safety decision was correct, but no safe alternative was recorded, so the official registry source was never copied in.
+
+**Fix applied on 2026-08-05:**
+
+- Read the official registry source from `https://magicui.design/r/globe.json`.
+- Installed the registry-declared runtime dependencies with `npm install cobe motion`.
+- Added the official Cobe-based implementation at `src/components/ui/globe.tsx`, matching Magic UI's documented import location.
+- Updated the splash screen to import `Globe` from `@/components/ui/globe`.
+- Removed the old local SVG globe recreation. The official component now supplies the dotted map, orange markers, autorotation, and pointer dragging.
+
+**Required workflow for future Magic UI additions:**
+
+1. Decide whether the requirement is for an official Magic UI registry component or a custom effect. Do not infer that a file named `src/components/magicui/*` is official.
+2. Read the component page and registry item before coding. The registry item is the source of truth for the component implementation and its dependencies. For example, the official Globe requires `cobe` and `motion`, not only the existing `framer-motion` package.
+3. Preserve Astryx. Do not run `npx shadcn@latest init` blindly in this repository because it can replace the existing Astryx CSS/theme setup. If a compatible `components.json` configuration is intentionally added, run the registry command only after confirming that it preserves `globals.css`, `layout.tsx`, and the Astryx provider. Otherwise, copy the official registry source into `src/components/ui/<component>.tsx` and install exactly the dependencies declared by that registry item.
+4. Import official registry components from `@/components/ui/<component>`. Keep custom local effects separate and label them as custom; do not give them an official Magic UI path or API by assumption.
+5. Verify both source and runtime integration. Confirm the import path, dependency presence, client boundary, keyboard/pointer behavior, reduced-motion behavior, responsive sizing, and theme compatibility. Run `npm run lint`, `npm run typecheck`, and `npm run build`, then manually inspect the affected route in a browser.
+
+**Definition of “official Magic UI component” for this repo:** The source must come from the Magic UI registry/docs or be installed by the registry command, all registry-declared dependencies must be present, and the consuming route must import the component from its generated `src/components/ui/` path. A locally authored file with `magicui` in its filename does not satisfy this definition.
+
+---
+
 ## Suggested app shape (all agents: follow this structure)
 
 Create/keep roughly this tree (adjust only if a stage requires it):
