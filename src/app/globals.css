@@ -162,15 +162,28 @@ select {
 }
 
 .splash-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   font-size: clamp(3.5rem, 9vw, 6.25rem);
-  line-height: 0.92;
+  line-height: 1;
   letter-spacing: -0.085em;
   text-wrap: balance;
+}
+
+.splash-heading__line {
+  display: block;
+  line-height: 1;
+}
+
+.splash-heading__line + .splash-heading__line {
+  margin-top: -0.04em;
 }
 
 .splash-heading__lead,
 .splash-heading__lead > span {
   line-height: 1;
+  padding-bottom: 0.06em;
   background: linear-gradient(to bottom, var(--splash-heading-top) 8%, var(--splash-heading-bottom) 100%);
   background-clip: text;
   -webkit-background-clip: text;
@@ -178,7 +191,7 @@ select {
 }
 
 .splash-heading__accent {
-  margin-top: 0.08em;
+  margin-top: 0;
   padding-bottom: 0.08em;
   line-height: 1;
   background: linear-gradient(125deg, var(--splash-accent-top) 0%, var(--splash-accent-bottom) 100%);
