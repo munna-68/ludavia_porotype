@@ -22,9 +22,9 @@ import {
   Square,
   TrendingUp,
 } from 'lucide-react';
-import { ShimmerButton } from '@/components/ui/shimmer-button';
+import { Globe, FORM_GLOBE_CONFIG } from '@/components/ui/globe';
+import { DotPattern } from '@/components/magicui/dot-pattern';
 import { TextAnimate } from '@/components/magicui/text-animate';
-import { ThemeToggle } from '@/components/chrome/theme-toggle';
 import { normalizeBusinessNeeds } from '@/lib/business-needs-schema';
 import { loadBusinessNeeds, saveBusinessNeeds } from '@/lib/session-store';
 import {
@@ -64,7 +64,6 @@ const EMPTY_VALUES: FormValues = {
 
 const DRAFT_KEY = 'ludavia-form-draft:v2';
 const TOTAL_STEPS = 5;
-const PROGRESS_SEGMENTS = TOTAL_STEPS * 2;
 
 const STEP_FIELDS: ReadonlyArray<ReadonlyArray<FieldName>> = [
   ['businessName'],
@@ -75,11 +74,11 @@ const STEP_FIELDS: ReadonlyArray<ReadonlyArray<FieldName>> = [
 ];
 
 const STEP_META = [
-  { eyebrow: 'Start', lead: 'What should we call', highlight: 'your business?', hint: 'A name gives the snapshot somewhere to begin.' },
-  { eyebrow: 'Model', lead: 'What kind of', highlight: 'business is it?', hint: 'Choose the closest fit. Nothing is permanent.' },
-  { eyebrow: 'Market', lead: 'Where do you', highlight: 'operate?', hint: 'Tell us your sector and where you call home.' },
-  { eyebrow: 'Stage', lead: 'Where are you in', highlight: 'the journey?', hint: 'Meet the business where it is today.' },
-  { eyebrow: 'Focus', lead: 'What would', highlight: 'move it forward?', hint: 'Pick the goal and kind of support that matters most.' },
+  { eyebrow: 'Start', lead: 'What should we', highlightLead: 'call', highlight: 'your business?', hint: 'A name gives the snapshot somewhere to begin.' },
+  { eyebrow: 'Model', lead: 'What kind of', highlightLead: undefined, highlight: 'business is it?', hint: 'Choose the closest fit. Nothing is permanent.' },
+  { eyebrow: 'Market', lead: 'Where do you', highlightLead: undefined, highlight: 'operate?', hint: 'Tell us your sector and where you call home.' },
+  { eyebrow: 'Stage', lead: 'Where are you in', highlightLead: undefined, highlight: 'the journey?', hint: 'Meet the business where it is today.' },
+  { eyebrow: 'Focus', lead: 'What would', highlightLead: undefined, highlight: 'move it forward?', hint: 'Pick the goal and kind of support that matters most.' },
 ] as const;
 
 const businessTypeIcons: Record<string, LucideIcon> = {
@@ -276,18 +275,21 @@ export function BusinessNeedsForm({ initialStep = 0 }: { initialStep?: number })
   }
 
   const meta = STEP_META[step];
-  const progress = Math.round(((step + 1) / TOTAL_STEPS) * 100);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-ink px-3 py-3 text-warm sm:px-6 sm:py-6">
+    <main className="form-page relative min-h-[100dvh] overflow-hidden bg-ink text-warm">
       <div className="noise-layer" />
-      <div className="dot-layer" />
-      <section className="relative z-10 mx-auto flex min-h-[calc(100dvh-1.5rem)] w-full max-w-[48rem] flex-col overflow-hidden rounded-[1.55rem] border border-white/15 bg-[#0b0b0f]/88 shadow-2xl shadow-black/40 sm:min-h-[calc(100dvh-3rem)] sm:rounded-[2rem]">
-        <header className="flex items-center gap-4 px-5 pb-5 pt-5 sm:gap-7 sm:px-9 sm:pb-7 sm:pt-8">
-          <button type="button" className="icon-button inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.025] text-white transition hover:border-white/30 hover:bg-white/[0.08]" aria-label={step === 0 ? 'Back to welcome page' : 'Go to previous step'} onClick={handleBack}>
+      <DotPattern width={20} height={20} cx={1} cy={1} cr={0.75} className="form-dot-pattern" />
+      <section className="form-shell relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[72rem] flex-col overflow-hidden">
+        <div className="form-globe-stage" aria-hidden="true">
+          <Globe config={FORM_GLOBE_CONFIG} className="form-globe pointer-events-none left-1/2 z-0 -translate-x-1/2" />
+        </div>
+
+        <header className="form-header relative z-20 flex items-center gap-4 px-5 pb-5 pt-5 sm:gap-7 sm:px-9 sm:pb-7 sm:pt-8">
+          <button type="button" className="form-back icon-button inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.025] text-white transition hover:border-white/30 hover:bg-white/[0.08]" aria-label={step === 0 ? 'Back to welcome page' : 'Go to previous step'} onClick={handleBack}>
             <ArrowLeft className="h-5 w-5" aria-hidden="true" />
           </button>
-          <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-2">
+          <div className="form-progress flex min-w-0 flex-1 items-center gap-1.5 sm:gap-2">
             {Array.from({ length: TOTAL_STEPS }, (_, index) => (
               <button
                 type="button"
@@ -305,26 +307,17 @@ export function BusinessNeedsForm({ initialStep = 0 }: { initialStep?: number })
               />
             ))}
           </div>
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="form-step-count flex shrink-0 items-center gap-2">
             <p className="text-xs text-white/70 sm:text-sm">Step {step + 1} <span className="text-white/35">of</span> {TOTAL_STEPS}</p>
-            <ThemeToggle />
           </div>
         </header>
 
-        <form className="flex min-h-0 flex-1 flex-col" onSubmit={(event) => { event.preventDefault(); handleContinue(); }}>
-          <motion.div key={step} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="flex flex-1 flex-col px-5 pb-8 sm:px-9 sm:pb-9">
-            <div className="mb-8 max-w-2xl sm:mb-10">
-              <p className="mb-4 text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-violet-bright">{meta.eyebrow}</p>
-              <h1 id={headingId} className="max-w-[16ch] font-display text-[clamp(2.75rem,7vw,4.85rem)] font-normal leading-[0.96] tracking-[-0.055em] text-white">
-                <TextAnimate>{meta.lead}</TextAnimate>
-                <br />
-                <span className="text-violet-bright">{meta.highlight}</span>
-              </h1>
-              <p className="mt-6 max-w-[42ch] text-base leading-7 text-white/60 sm:text-lg">{meta.hint}</p>
-            </div>
+        <form className="form-body flex min-h-0 flex-1 flex-col" onSubmit={(event) => { event.preventDefault(); handleContinue(); }}>
+          <motion.div key={step} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="form-step-content flex flex-1 flex-col px-5 pb-8 sm:px-9 sm:pb-9">
+            <StepHeading id={headingId} meta={meta} />
 
             <fieldset className="min-w-0 flex-1" aria-labelledby={headingId}>
-              <legend className="sr-only">{meta.lead} {meta.highlight}</legend>
+              <legend className="sr-only">{meta.lead} {meta.highlightLead ? `${meta.highlightLead} ` : ''}{meta.highlight}</legend>
               {step === 0 ? (
                 <div data-field="businessName">
                   <TextField
@@ -432,25 +425,14 @@ export function BusinessNeedsForm({ initialStep = 0 }: { initialStep?: number })
             ) : null}
 
             <div className="mt-8 sm:mt-10">
-              <ShimmerButton type="submit" className="w-full justify-between" disabled={isNavigating}>
+              <button type="submit" className="onboarding-action" disabled={isNavigating}>
                 <span>{isNavigating ? 'Saving snapshot' : 'Continue'}</span>
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-violet-bright text-white shadow-[0_0_24px_rgba(164,109,255,0.38)] transition-transform duration-300 group-hover:translate-x-1">
-                  <ArrowRight className="h-5 w-5" aria-hidden="true" />
-                </span>
-              </ShimmerButton>
+                <span className="onboarding-action__arrow" aria-hidden="true"><ArrowRight /></span>
+              </button>
             </div>
           </motion.div>
         </form>
 
-        <footer className="mt-auto border-t border-white/10 px-5 pb-6 pt-5 sm:px-9 sm:pb-8">
-          <div className="mb-3 flex items-center justify-between text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-white/55">
-            <span>Journey</span>
-            <span className="text-white">{progress}%</span>
-          </div>
-          <div className="journey-track" aria-label={`Journey progress: ${progress}%`} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}>
-            <div className="journey-track__fill" style={{ width: `${progress}%` }} />
-          </div>
-        </footer>
       </section>
     </main>
   );
@@ -461,183 +443,13 @@ function StepHeading({ id, meta }: { id: string; meta: (typeof STEP_META)[number
     <div className="onboarding-heading">
       <p className="onboarding-eyebrow">{meta.eyebrow}</p>
       <h1 id={id}>
-        <TextAnimate>{meta.lead}</TextAnimate>
-        <br />
-        <span>{meta.highlight}</span>
+        <span className="onboarding-heading__line"><TextAnimate>{meta.lead}</TextAnimate></span>
+        <span className="onboarding-heading__line onboarding-heading__line--answer">
+          {meta.highlightLead ? <span className="onboarding-heading__plain"><TextAnimate>{meta.highlightLead}</TextAnimate></span> : null}
+          <span className="onboarding-heading__accent"><TextAnimate>{meta.highlight}</TextAnimate></span>
+        </span>
       </h1>
       <p className="onboarding-hint">{meta.hint}</p>
-    </div>
-  );
-}
-
-function OnboardingHeader({
-  panelStep,
-  onBack,
-  onJump,
-  showTheme = false,
-}: {
-  panelStep: number;
-  onBack: () => void;
-  onJump: (index: number) => void;
-  showTheme?: boolean;
-}) {
-  const segmentLimit = (panelStep + 1) * (PROGRESS_SEGMENTS / TOTAL_STEPS);
-
-  return (
-    <header className="onboarding-panel__header">
-      <button type="button" className="onboarding-back" aria-label={panelStep === 0 ? 'Back to welcome page' : 'Go to previous step'} onClick={onBack}>
-        <ArrowLeft aria-hidden="true" />
-      </button>
-      <div className="onboarding-segments" aria-label={`Step ${panelStep + 1} of ${TOTAL_STEPS}`}>
-        {Array.from({ length: PROGRESS_SEGMENTS }, (_, index) => (
-          <button
-            type="button"
-            key={index}
-            className="onboarding-segment"
-            data-complete={index < segmentLimit}
-            aria-label={`Go to step ${Math.floor(index / 2) + 1}`}
-            onClick={() => onJump(Math.floor(index / 2))}
-          />
-        ))}
-      </div>
-      <p className="onboarding-step-count">Step {panelStep + 1} <span>of</span> {TOTAL_STEPS}</p>
-      {showTheme ? <ThemeToggle /> : null}
-    </header>
-  );
-}
-
-function PanelAction({ label, disabled, isLoading }: { label: string; disabled?: boolean; isLoading?: boolean }) {
-  return (
-    <div className="onboarding-action-wrap">
-      <button type="submit" className="onboarding-action" disabled={disabled}>
-        <span>{label}</span>
-        <span className="onboarding-action__arrow" aria-hidden="true">
-          <ArrowRight />
-        </span>
-      </button>
-      {isLoading ? <span className="sr-only">Saving your business snapshot</span> : null}
-    </div>
-  );
-}
-
-function PanelFooter({ progress }: { progress: number }) {
-  return (
-    <footer className="onboarding-panel__footer">
-      <div className="onboarding-panel__footer-meta">
-        <span>Journey</span>
-        <span>{progress}%</span>
-      </div>
-      <div className="journey-track" aria-label={`Journey progress: ${progress}%`} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}>
-        <div className="journey-track__fill" style={{ width: `${progress}%` }} />
-      </div>
-    </footer>
-  );
-}
-
-function StepFields({
-  step,
-  values,
-  errors,
-  preview,
-  onUpdate,
-}: {
-  step: number;
-  values: FormValues;
-  errors: Partial<Record<FieldName, string>>;
-  preview: boolean;
-  onUpdate: <K extends keyof FormValues>(field: K, value: FormValues[K]) => void;
-}) {
-  if (step === 0) {
-    return null;
-  }
-
-  if (step === 1) {
-    return (
-      <ChoiceGrid
-        field="businessType"
-        ariaLabel="Business type"
-        options={businessTypeOptions}
-        value={preview ? 'other' : values.businessType}
-        icons={businessTypeIcons}
-        error={errors.businessType}
-        onSelect={(value) => onUpdate('businessType', value)}
-      />
-    );
-  }
-
-  if (step === 2) {
-    return (
-      <div className="grid gap-4" data-field="industry-location">
-        <SelectField
-          id="industry"
-          label="Sector"
-          placeholder="Choose a sector"
-          options={industryOptions}
-          value={values.industry}
-          icon={Building2}
-          error={errors.industry}
-          onChange={(value) => onUpdate('industry', value)}
-        />
-        <div data-field="location">
-          <TextField
-            id="location"
-            label="Location"
-            placeholder="City, region, or country"
-            value={values.location}
-            icon={MapPin}
-            error={errors.location}
-            onChange={(value) => onUpdate('location', value)}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  if (step === 3) {
-    return (
-      <ChoiceGrid
-        field="stage"
-        ariaLabel="Business stage"
-        options={stageOptions}
-        value={values.stage}
-        icons={stageIcons}
-        error={errors.stage}
-        onSelect={(value) => onUpdate('stage', value as BusinessStage)}
-      />
-    );
-  }
-
-  return (
-    <div className="grid gap-5">
-      <ChoiceGrid
-        field="mainGoal"
-        ariaLabel="Main goal"
-        options={mainGoalOptions}
-        value={values.mainGoal}
-        icons={mainGoalIcons}
-        error={errors.mainGoal}
-        onSelect={(value) => onUpdate('mainGoal', value)}
-      />
-      <div data-field="helpNeeded">
-        <SelectField
-          id="helpNeeded"
-          label="Where do you need help?"
-          placeholder="Choose one"
-          options={helpNeededOptions}
-          value={values.helpNeeded}
-          icon={CircleHelp}
-          error={errors.helpNeeded}
-          onChange={(value) => onUpdate('helpNeeded', value)}
-        />
-      </div>
-      <TextAreaField
-        id="description"
-        label="Anything else? (optional)"
-        placeholder="A little more context can sharpen the snapshot."
-        value={values.description}
-        maxLength={500}
-        onChange={(value) => onUpdate('description', value)}
-      />
     </div>
   );
 }

@@ -4,6 +4,7 @@
 
 **Product:** LudaVia (secondary mark **L:V**). Investor-facing high-fidelity prototype — not production.
 **Goal:** Convince stakeholders in a live laptop demo. Visual polish and a seamless end-to-end flow beat backend completeness.
+**Design source of truth:** Read `design.md` before any UI work and keep all routes consistent with it.
 **Demo story:** User shares a bit about their business → sees one sample opportunity + one sample connection → gets a **live** AI growth summary (Gemini) with **one** clear recommended next step.
 **Brand (locked for this prototype):**
 - Dominant: black / near-black (dark-first aesthetic; light mode still required and polished)

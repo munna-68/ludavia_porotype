@@ -35,6 +35,16 @@ const GLOBE_CONFIG: COBEOptions = {
   ],
 };
 
+export const FORM_GLOBE_CONFIG: COBEOptions = {
+  ...GLOBE_CONFIG,
+  dark: 1,
+  diffuse: 1.2,
+  mapBrightness: 6,
+  baseColor: [0.08, 0.08, 0.1],
+  markerColor: [164 / 255, 109 / 255, 255 / 255],
+  glowColor: [0.8, 0.8, 0.85],
+};
+
 export function Globe({
   className,
   config = GLOBE_CONFIG,
