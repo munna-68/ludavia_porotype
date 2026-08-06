@@ -16,6 +16,7 @@
   "dependencies": {
     "@astryxdesign/core": "^0.2.0",
     "@astryxdesign/theme-neutral": "^0.2.0",
+    "@google/genai": "^2.16.0",
     "@tailwindcss/postcss": "^4.3.3",
     "client-only": "^0.0.1",
     "clsx": "^2.1.1",

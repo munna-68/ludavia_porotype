@@ -805,11 +805,11 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
 - [ ] API key is not present in client JS or browser network request to Google; only the same-origin route is called by the UI.
 - [ ] `npm run lint`, `npm run typecheck`, and `npm run build` succeed.
 
-**Status: NOT STARTED**
+**Status: IN PROGRESS**
 
 **Model Tier: Medium**
 
-**Verification Notes:** Not verified. Current model/SDK facts were audited on 2026-08-05 and must be rechecked at implementation time.
+**Verification Notes:** In progress: 2026-08-06 — Added `@google/genai` 2.16.0, shared Zod output validation, server-only Gemini generation with `gemini-3.6-flash` as the stable default, structured output configuration, timeout/abort handling, and `POST /api/generate-summary` with `400`/`503`/`502` handling and no-store responses. `npm run lint`, `npm run typecheck`, `npm run build`, and `git diff --check` pass. Local malformed-body and missing-key checks returned `400` and `503`; one live key availability check confirmed access to both `gemini-3.5-flash` and `gemini-3.6-flash`, but guarded generation attempts returned non-JSON provider text and correctly returned `502`, so the valid `200` acceptance path remains blocked until the provider returns the requested structured object. The supplied key was used only as a process environment variable and is not tracked.
 
 ---
 
