@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Button } from '@astryxdesign/core/Button';
 import { ArrowRight } from 'lucide-react';
 import { AskVia21 } from '@/components/results/ask-via21';
@@ -10,6 +11,7 @@ import { NextStepPanel } from '@/components/results/next-step-panel';
 import { OpportunityCard } from '@/components/results/opportunity-card';
 import { labelForField } from '@/data/form-options';
 import type { BusinessNeedsInput, GrowthSummaryResult } from '@/lib/types';
+import { fadeUpTransition, fadeUpVariants, reducedMotionTransition } from '@/lib/motion';
 
 type GuidedBriefingProps = {
   values: BusinessNeedsInput;
@@ -23,12 +25,16 @@ const CONTINUE_LABELS = ['Continue to the leverage', 'Continue to the opportunit
 
 export function GuidedBriefing({ values, fallbackResult, result, onResult }: GuidedBriefingProps) {
   const [revealedThrough, setRevealedThrough] = useState(0);
+  const shouldReduceMotion = useReducedMotion();
   const context = createBriefingContext(values);
 
   function revealBeat(nextBeat: number) {
     setRevealedThrough(nextBeat);
     window.requestAnimationFrame(() => {
-      document.getElementById(`guided-beat-${nextBeat}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById(`guided-beat-${nextBeat}`)?.scrollIntoView({
+        behavior: shouldReduceMotion ? 'auto' : 'smooth',
+        block: 'start',
+      });
     });
   }
 
@@ -42,80 +48,107 @@ export function GuidedBriefing({ values, fallbackResult, result, onResult }: Gui
 
   return (
     <section className="guided-briefing" aria-label="Via21 growth briefing">
-      <article
-        id="guided-beat-0"
-        className="guided-briefing__beat"
-        aria-labelledby="guided-beat-heading-0"
-      >
-        <BriefingBeatHeader number="01" label="Observation" headingId="guided-beat-heading-0">
-          Here&apos;s what I see
-        </BriefingBeatHeader>
-        <div className="via21-note">
-          <div className="via21-note__meta">
-            <span>Via21</span>
-            <span>First read</span>
-          </div>
-          <p>{context.observation}</p>
-        </div>
-        <dl className="briefing-context">
-          <div className="briefing-context__row">
-            <dt>Focus</dt>
-            <dd>{context.goal}</dd>
-          </div>
-          <div className="briefing-context__row">
-            <dt>Stage</dt>
-            <dd>{context.stage} stage</dd>
-          </div>
-          <div className="briefing-context__row">
-            <dt>Market</dt>
-            <dd>{context.industry} · {context.location}</dd>
-          </div>
-        </dl>
-        {revealedThrough === 0 ? <BriefingControls label={CONTINUE_LABELS[0]} onContinue={continueBriefing} onSkip={skipBriefing} /> : null}
-      </article>
+      <AnimatePresence mode="sync">
+        {revealedThrough >= 0 ? (
+          <motion.article
+            key="beat-0"
+            id="guided-beat-0"
+            className="guided-briefing__beat"
+            aria-labelledby="guided-beat-heading-0"
+            initial={shouldReduceMotion ? false : 'hidden'}
+            animate="visible"
+            variants={fadeUpVariants}
+            transition={shouldReduceMotion ? reducedMotionTransition : fadeUpTransition}
+          >
+            <BriefingBeatHeader number="01" label="Observation" headingId="guided-beat-heading-0">
+              Here&apos;s what I see
+            </BriefingBeatHeader>
+            <div className="via21-note">
+              <div className="via21-note__meta">
+                <span>Via21</span>
+                <span>First read</span>
+              </div>
+              <p>{context.observation}</p>
+            </div>
+            <dl className="briefing-context">
+              <div className="briefing-context__row">
+                <dt>Focus</dt>
+                <dd>{context.goal}</dd>
+              </div>
+              <div className="briefing-context__row">
+                <dt>Stage</dt>
+                <dd>{context.stage} stage</dd>
+              </div>
+              <div className="briefing-context__row">
+                <dt>Market</dt>
+                <dd>{context.industry} · {context.location}</dd>
+              </div>
+            </dl>
+            {revealedThrough === 0 ? <BriefingControls label={CONTINUE_LABELS[0]} onContinue={continueBriefing} onSkip={skipBriefing} /> : null}
+          </motion.article>
+        ) : null}
 
-      <article
-        id="guided-beat-1"
-        className="guided-briefing__beat"
-        aria-labelledby="guided-beat-heading-1"
-        hidden={revealedThrough < 1}
-      >
-        <BriefingBeatHeader number="02" label="Leverage" headingId="guided-beat-heading-1">
-          Here&apos;s where the leverage is
-        </BriefingBeatHeader>
-        <AiSummaryPanel values={values} fallbackResult={fallbackResult} onResult={onResult} />
-        <AskVia21 />
-        {revealedThrough === 1 ? <BriefingControls label={CONTINUE_LABELS[1]} onContinue={continueBriefing} onSkip={skipBriefing} /> : null}
-      </article>
+        {revealedThrough >= 1 ? (
+          <motion.article
+            key="beat-1"
+            id="guided-beat-1"
+            className="guided-briefing__beat"
+            aria-labelledby="guided-beat-heading-1"
+            initial={shouldReduceMotion ? false : 'hidden'}
+            animate="visible"
+            variants={fadeUpVariants}
+            transition={shouldReduceMotion ? reducedMotionTransition : fadeUpTransition}
+          >
+            <BriefingBeatHeader number="02" label="Leverage" headingId="guided-beat-heading-1">
+              Here&apos;s where the leverage is
+            </BriefingBeatHeader>
+            <AiSummaryPanel values={values} fallbackResult={fallbackResult} onResult={onResult} />
+            <AskVia21 />
+            {revealedThrough === 1 ? <BriefingControls label={CONTINUE_LABELS[1]} onContinue={continueBriefing} onSkip={skipBriefing} /> : null}
+          </motion.article>
+        ) : null}
 
-      <article
-        id="guided-beat-2"
-        className="guided-briefing__beat"
-        aria-labelledby="guided-beat-heading-2"
-        hidden={revealedThrough < 2}
-      >
-        <BriefingBeatHeader number="03" label="Potential match" headingId="guided-beat-heading-2">
-          Here&apos;s a potential opportunity or connection
-        </BriefingBeatHeader>
-        <p className="guided-briefing__lead">One illustrative path to explore, paired with one illustrative perspective. Nothing here represents a live introduction.</p>
-        <div className="guided-briefing__cards">
-          <OpportunityCard values={values} />
-          <ConnectionCard values={values} />
-        </div>
-        {revealedThrough === 2 ? <BriefingControls label={CONTINUE_LABELS[2]} onContinue={continueBriefing} onSkip={skipBriefing} /> : null}
-      </article>
+        {revealedThrough >= 2 ? (
+          <motion.article
+            key="beat-2"
+            id="guided-beat-2"
+            className="guided-briefing__beat"
+            aria-labelledby="guided-beat-heading-2"
+            initial={shouldReduceMotion ? false : 'hidden'}
+            animate="visible"
+            variants={fadeUpVariants}
+            transition={shouldReduceMotion ? reducedMotionTransition : fadeUpTransition}
+          >
+            <BriefingBeatHeader number="03" label="Potential match" headingId="guided-beat-heading-2">
+              Here&apos;s a potential opportunity or connection
+            </BriefingBeatHeader>
+            <p className="guided-briefing__lead">One illustrative path to explore, paired with one illustrative perspective. Nothing here represents a live introduction.</p>
+            <div className="guided-briefing__cards">
+              <OpportunityCard values={values} />
+              <ConnectionCard values={values} />
+            </div>
+            {revealedThrough === 2 ? <BriefingControls label={CONTINUE_LABELS[2]} onContinue={continueBriefing} onSkip={skipBriefing} /> : null}
+          </motion.article>
+        ) : null}
 
-      <article
-        id="guided-beat-3"
-        className="guided-briefing__beat"
-        aria-labelledby="guided-beat-heading-3"
-        hidden={revealedThrough < 3}
-      >
-        <BriefingBeatHeader number="04" label="Next move" headingId="guided-beat-heading-3">
-          Here&apos;s the next move I recommend
-        </BriefingBeatHeader>
-        <NextStepPanel result={result} />
-      </article>
+        {revealedThrough >= 3 ? (
+          <motion.article
+            key="beat-3"
+            id="guided-beat-3"
+            className="guided-briefing__beat"
+            aria-labelledby="guided-beat-heading-3"
+            initial={shouldReduceMotion ? false : 'hidden'}
+            animate="visible"
+            variants={fadeUpVariants}
+            transition={shouldReduceMotion ? reducedMotionTransition : fadeUpTransition}
+          >
+            <BriefingBeatHeader number="04" label="Next move" headingId="guided-beat-heading-3">
+              Here&apos;s the next move I recommend
+            </BriefingBeatHeader>
+            <NextStepPanel values={values} result={result} />
+          </motion.article>
+        ) : null}
+      </AnimatePresence>
     </section>
   );
 }

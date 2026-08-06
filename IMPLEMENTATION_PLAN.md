@@ -1010,11 +1010,11 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
 - [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**
+**Status: COMPLETED**
 
 **Model Tier: High**
 
-**Verification Notes:** Not verified.
+**Verification Notes:** Completed: 2026-08-07 — Added the shared framer-motion fade-up vocabulary across splash/form/results, one-time four-beat reveals with Continue/Skip, a reduced-motion-aware three-second Via21 thinking handoff, animated local follow-up/confirmation states, and a client-only branded one-page `Save the plan` PDF export using `jspdf`. Added same-tab success/unavailable caching plus in-flight deduplication and a server-side profile cache so a profile makes at most one live request per tab/cache window; browser verification used a synthetic API response and forced client failure without additional Gemini calls (first synthetic request 1, same-profile reload 0, prepared fallback visible). Chromium checks at 390x844 and 1280x800 in dark/light themes showed no horizontal overflow and no console errors; the generated PDF parsed as 1 page with snapshot, Via21 summary, illustrative opportunity/connection, and recommendation. `PATH="/opt/homebrew/opt/node@24/bin:$PATH" npm run lint`, `npm run typecheck`, `npm run build`, `npm run astryx -- doctor`, and `git diff --check` pass. Stage 5 remains independently BLOCKED for the missing approved logo variant.`
 
 ---
 

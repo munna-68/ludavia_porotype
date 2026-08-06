@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { DropdownMenu, DropdownMenuItem } from '@astryxdesign/core/DropdownMenu';
 import { SelectableCard } from '@astryxdesign/core/SelectableCard';
 import type { LucideIcon } from 'lucide-react';
@@ -46,6 +46,7 @@ import {
 } from '@/data/form-options';
 import type { BusinessNeedsInput, BusinessStage } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { fadeUpTransition, fadeUpVariants, reducedMotionTransition } from '@/lib/motion';
 
 type FormValues = {
   businessName: string;
@@ -175,6 +176,7 @@ function focusFirstInvalid(field: FieldName) {
 export function BusinessNeedsForm({ initialStep = 0 }: { initialStep?: number }) {
   const router = useRouter();
   const headingId = useId();
+  const shouldReduceMotion = useReducedMotion();
   const startingStep = Math.min(Math.max(Math.round(initialStep), 0), TOTAL_STEPS - 1);
   const [hydrated, setHydrated] = useState(false);
   const [step, setStep] = useState(startingStep);
@@ -340,7 +342,14 @@ export function BusinessNeedsForm({ initialStep = 0 }: { initialStep?: number })
         </header>
 
         <form className="form-body flex min-h-0 flex-1 flex-col" onSubmit={(event) => { event.preventDefault(); handleContinue(); }}>
-          <motion.div key={step} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className={cn('form-step-content flex flex-1 flex-col px-5 pb-8 sm:px-9 sm:pb-9', step > 0 && 'form-step-content--detail')}>
+          <motion.div
+            key={step}
+            initial={shouldReduceMotion ? false : 'hidden'}
+            animate="visible"
+            variants={fadeUpVariants}
+            transition={shouldReduceMotion ? reducedMotionTransition : fadeUpTransition}
+            className={cn('form-step-content flex flex-1 flex-col px-5 pb-8 sm:px-9 sm:pb-9', step > 0 && 'form-step-content--detail')}
+          >
             <StepHeading id={headingId} meta={meta} />
 
             <fieldset className="min-w-0 flex-1" aria-labelledby={headingId}>
