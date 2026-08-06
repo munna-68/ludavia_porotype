@@ -254,6 +254,7 @@ select {
 .splash-cta {
   min-height: 6rem;
   border-radius: 999px;
+  color: var(--color-on-accent) !important;
   font-size: clamp(1.1rem, 3vw, 1.7rem);
   font-weight: 600;
   letter-spacing: -0.035em;
@@ -598,19 +599,31 @@ select {
 }
 
 .onboarding-segment {
-  height: 0.22rem;
+  position: relative;
+  height: 2.75rem;
   padding: 0;
   border: 0;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.11);
+  background: transparent;
   cursor: pointer;
+}
+
+.onboarding-segment::before {
+  position: absolute;
+  inset: auto 0;
+  top: 50%;
+  height: 3px;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.11);
+  content: "";
+  transform: translateY(-50%);
   transition:
     background-color 220ms ease,
     box-shadow 220ms ease;
 }
 
-.onboarding-segment[data-complete="true"] {
-  background: var(--violet-bright);
+.onboarding-segment[data-complete="true"]::before {
+  background-color: var(--violet-bright);
   box-shadow: 0 0 0.75rem rgba(164, 109, 255, 0.55);
 }
 
@@ -1170,18 +1183,42 @@ html.light .onboarding-action:hover:not(:disabled) {
 }
 
 .progress-segment {
-  height: 3px;
+  position: relative;
+  height: 2.75rem;
+  padding: 0;
   border: 0;
   border-radius: 999px;
+  background: transparent;
+}
+
+.progress-segment::before {
+  position: absolute;
+  inset: auto 0;
+  top: 50%;
+  height: 3px;
+  border-radius: inherit;
   background: rgba(255, 255, 255, 0.1);
+  content: "";
+  transform: translateY(-50%);
   transition:
     background-color 220ms ease,
     box-shadow 220ms ease;
 }
 
-.progress-segment[data-complete="true"] {
-  background: var(--violet-bright);
+.progress-segment[data-complete="true"]::before {
+  background-color: var(--violet-bright);
   box-shadow: 0 0 12px rgba(164, 109, 255, 0.45);
+}
+
+.onboarding-segment:focus-visible,
+.progress-segment:focus-visible {
+  outline: none;
+}
+
+.onboarding-segment:focus-visible::before,
+.progress-segment:focus-visible::before {
+  outline: 2px solid var(--violet-bright);
+  outline-offset: 3px;
 }
 
 .journey-track {
@@ -1511,8 +1548,8 @@ html.light .onboarding-action:hover:not(:disabled) {
 }
 
 .result-dialog__header button {
-  width: 2.5rem !important;
-  height: 2.5rem !important;
+  width: 2.75rem !important;
+  height: 2.75rem !important;
   border: 1px solid var(--line) !important;
   border-radius: 999px !important;
   background: transparent !important;
@@ -1804,9 +1841,12 @@ html.light .onboarding-action:hover:not(:disabled) {
 
 .results-recap__edit {
   display: inline-flex;
+  min-height: 2.75rem;
   flex: 0 0 auto;
   align-items: center;
   gap: 0.35rem;
+  margin-inline: -0.25rem;
+  padding-inline: 0.25rem;
   color: var(--violet-bright);
   font-size: 0.78rem;
   font-weight: 600;
@@ -1957,6 +1997,8 @@ html.light .onboarding-action:hover:not(:disabled) {
 }
 
 .guided-briefing__skip {
+  min-height: 2.75rem !important;
+  padding-inline: 0.5rem !important;
   color: var(--muted) !important;
 }
 
@@ -1999,6 +2041,12 @@ html.light .onboarding-action:hover:not(:disabled) {
 
 .ask-via21__form .astryx-text-input {
   width: 100%;
+}
+
+.ask-via21__form button,
+.next-step-panel__confirmation-actions button,
+.next-step-panel__correction button {
+  min-height: 2.75rem !important;
 }
 
 .ask-via21__response {
@@ -2291,9 +2339,26 @@ html.light .choice-card:hover {
 }
 
 html.light .progress-segment,
+html.light .onboarding-segment {
+  border-color: rgba(20, 18, 24, 0.35);
+  background-color: transparent;
+  box-shadow: none;
+}
+
 html.light .journey-track {
   border-color: rgba(20, 18, 24, 0.35);
   background-color: rgba(20, 18, 24, 0.1);
+}
+
+html.light .progress-segment::before,
+html.light .onboarding-segment::before {
+  background-color: rgba(20, 18, 24, 0.1);
+}
+
+html.light .progress-segment[data-complete="true"]::before,
+html.light .onboarding-segment[data-complete="true"]::before {
+  background-color: var(--violet-bright);
+  box-shadow: 0 0 0.75rem var(--violet-soft);
 }
 
 html.light .splash-frame {
@@ -2311,6 +2376,10 @@ html.light .theme-toggle {
 html.light .theme-toggle:hover {
   background: rgba(29, 24, 33, 0.06);
   color: var(--warm);
+}
+
+html.light .splash-cta {
+  color: var(--color-on-accent) !important;
 }
 
 ::view-transition-old(root),

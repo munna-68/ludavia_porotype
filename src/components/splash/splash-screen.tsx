@@ -40,7 +40,7 @@ export function SplashScreen() {
             shimmerColor="rgba(255, 255, 255, 0.7)"
             shimmerDuration="4s"
             shimmerSize="0.04em"
-            className="splash-cta w-full border-white/35 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_24px_90px_rgba(240,130,38,0.2)] hover:border-white/65"
+            className="splash-cta w-full border-white/35 hover:border-white/65"
           >
             <span className="splash-cta__content">
               <span>Begin your journey</span>

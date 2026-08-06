@@ -1047,11 +1047,11 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
 - [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**
+**Status: COMPLETED**
 
 **Model Tier: High**
 
-**Verification Notes:** Not verified.
+**Verification Notes:** Completed: 2026-08-07 — Stage 18 verified in Chromium against the running app at 390, 768, 1024, 1280, and 1440px in dark and light themes. Fixed light-theme journey progress, light splash CTA contrast, responsive tap targets, focused progress-segment treatment, result dialog sizing, root metadata, and unused create-next-app assets. Mouse-only splash → five-step form → results completed; same-tab results reload restored the profile; a fresh `/results` tab redirected to `/form`; no horizontal overflow was found at any required width. Verified observation, thinking, live success, prepared fallback under offline API conditions, guided confirmation/correction, Ask Via21, PDF export, and theme switching/persistence. Mobile and desktop Lighthouse snapshots both scored 100 across Accessibility, Best Practices, SEO, and Agentic Browsing. `PATH="/opt/homebrew/opt/node@24/bin:$PATH" npm run lint`, `npm run typecheck`, `npm run build`, `npm run astryx -- doctor` (6 passed, 0 warnings, 0 failures), and `git diff --check` pass. Stage 5 remains independently BLOCKED for the missing approved logo variant.`
 
 ---
 

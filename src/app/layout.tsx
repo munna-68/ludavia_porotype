@@ -4,7 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "LudaVia",
-  description: "LudaVia investor prototype",
+  description: "A focused growth snapshot prototype for small businesses.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
