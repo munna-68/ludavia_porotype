@@ -1,4 +1,4 @@
-import type { BusinessStage } from '@/lib/types';
+import type { BusinessNeedsInput, BusinessStage } from '@/lib/types';
 
 export type FormOption = {
   value: string;
@@ -103,6 +103,21 @@ export const helpNeededOptions: ReadonlyArray<FormOption> = [
     description: 'Guidance on the big calls.',
   },
 ];
+
+function sharedOptionValue(options: ReadonlyArray<FormOption>, value: string): string {
+  return options.find((option) => option.value === value)?.value ?? '';
+}
+
+export const presenterSampleBusiness = {
+  businessName: 'Morrow Care',
+  businessType: sharedOptionValue(businessTypeOptions, 'product-saas'),
+  industry: sharedOptionValue(industryOptions, 'health'),
+  location: 'Austin, Texas',
+  stage: stageOptions.find((option) => option.value === 'early')?.value ?? 'early',
+  mainGoal: sharedOptionValue(mainGoalOptions, 'find-customers'),
+  helpNeeded: sharedOptionValue(helpNeededOptions, 'go-to-market'),
+  description: 'A care navigation platform helping independent clinics guide new parents through postpartum support.',
+} satisfies BusinessNeedsInput;
 
 const businessTypeLabels: Record<string, string> = Object.fromEntries(
   businessTypeOptions.map((o) => [o.value, o.label]),

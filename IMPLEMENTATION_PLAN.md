@@ -1093,11 +1093,11 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
 - [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**
+**Status: BLOCKED**
 
 **Model Tier: Medium**
 
-**Verification Notes:** Not verified.
+**Verification Notes:** Implemented 2026-08-07 - Added `DEMO_SCRIPT.md` with the exact Morrow Care pitch path, server-only Gemini setup, fallback/reset instructions, and current UI labels; added the keyboard-accessible presenter-only `Use sample business` control backed by shared form option values; updated README setup guidance. `PATH="/opt/homebrew/opt/node@24/bin:$PATH" npm run lint`, `npm run typecheck`, `npm run build`, and `git diff --check` pass. Production browser verification on the fallback run completed splash -> sample fill -> five-step submission -> four-beat briefing -> local recommendation confirmation -> one-page PDF download; the downloaded PDF is a one-page PDF, and a fresh `/results` tab redirects to `/form`. The supplied server-only key reached Gemini, but live verification is blocked by external provider limits: `gemini-3.6-flash` returned `429 RESOURCE_EXHAUSTED` and the `gemini-2.5-flash` override returned `404` because that model is unavailable to this key. The two production servers started for verification were stopped; no key was added to tracked files.
 
 ---
 

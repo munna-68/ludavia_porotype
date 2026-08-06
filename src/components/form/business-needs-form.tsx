@@ -41,6 +41,7 @@ import {
   helpNeededOptions,
   industryOptions,
   mainGoalOptions,
+  presenterSampleBusiness,
   stageOptions,
   type FormOption,
 } from '@/data/form-options';
@@ -217,6 +218,15 @@ export function BusinessNeedsForm({ initialStep = 0 }: { initialStep?: number })
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
     setStorageError(null);
+  }
+
+  function usePresenterSample() {
+    setValues({ ...presenterSampleBusiness });
+    setStep(0);
+    setErrors({});
+    setAttempted(false);
+    setStorageError(null);
+    window.scrollTo({ top: 0, behavior: shouldReduceMotion ? 'auto' : 'smooth' });
   }
 
   function validateCurrentStep() {
@@ -466,6 +476,9 @@ export function BusinessNeedsForm({ initialStep = 0 }: { initialStep?: number })
               <button type="submit" className="onboarding-action" disabled={isNavigating}>
                 <span>{isNavigating ? 'Saving snapshot' : 'Continue'}</span>
                 <span className="onboarding-action__arrow" aria-hidden="true"><ArrowRight /></span>
+              </button>
+              <button type="button" className="presenter-sample-control" onClick={usePresenterSample}>
+                Use sample business
               </button>
             </div>
           </motion.div>

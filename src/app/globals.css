@@ -458,6 +458,32 @@ select {
   transform: translateY(-0.125rem);
 }
 
+.presenter-sample-control {
+  display: block;
+  min-height: 2.75rem;
+  margin: 0.5rem auto 0;
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--subtle);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color 180ms ease;
+}
+
+.presenter-sample-control:hover {
+  color: var(--violet-bright);
+}
+
+.presenter-sample-control:focus-visible {
+  outline: 2px solid var(--violet-bright);
+  outline-offset: 3px;
+}
+
 .onboarding-page {
   --onboarding-bg: var(--ink);
   --onboarding-panel: var(--ink);
