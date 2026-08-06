@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { GoogleGenAI, Type } from '@google/genai';
+import { GoogleGenAI, ThinkingLevel, Type } from '@google/genai';
 import { growthSummarySchema } from '@/lib/growth-summary-schema';
 import type { BusinessNeedsInput, GeminiPayload } from '@/lib/types';
 import { geminiApiKey, geminiModel } from '@/server/gemini-config';
@@ -67,9 +67,12 @@ export async function generateGrowthSummary(profile: BusinessNeedsInput): Promis
       config: {
         abortSignal: controller.signal,
         httpOptions: { timeout: REQUEST_TIMEOUT_MS },
-        maxOutputTokens: 700,
-        responseSchema,
+        maxOutputTokens: 900,
+        responseJsonSchema: responseSchema,
         responseMimeType: 'application/json',
+        thinkingConfig: geminiModel.startsWith('gemini-2.5')
+          ? { thinkingBudget: 0 }
+          : { thinkingLevel: ThinkingLevel.MINIMAL },
         temperature: 0.35,
       },
     });

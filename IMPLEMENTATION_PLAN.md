@@ -805,11 +805,11 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
 - [ ] API key is not present in client JS or browser network request to Google; only the same-origin route is called by the UI.
 - [ ] `npm run lint`, `npm run typecheck`, and `npm run build` succeed.
 
-**Status: IN PROGRESS**
+**Status: COMPLETED**
 
 **Model Tier: Medium**
 
-**Verification Notes:** In progress: 2026-08-06 — Added `@google/genai` 2.16.0, shared Zod output validation, server-only Gemini generation with `gemini-3.6-flash` as the stable default, structured output configuration, timeout/abort handling, and `POST /api/generate-summary` with `400`/`503`/`502` handling and no-store responses. `npm run lint`, `npm run typecheck`, `npm run build`, and `git diff --check` pass. Local malformed-body and missing-key checks returned `400` and `503`; one live key availability check confirmed access to both `gemini-3.5-flash` and `gemini-3.6-flash`, but guarded generation attempts returned non-JSON provider text and correctly returned `502`, so the valid `200` acceptance path remains blocked until the provider returns the requested structured object. The supplied key was used only as a process environment variable and is not tracked.
+**Verification Notes:** Completed: 2026-08-06 — Added `@google/genai` 2.16.0, shared Zod output validation, server-only Gemini generation with `gemini-3.6-flash` as the stable default, structured output configuration, timeout/abort handling, and `POST /api/generate-summary` with `400`/`503`/`502` handling and no-store responses. Root cause of the prior `502` was `gemini-3.6-flash` exhausting `maxOutputTokens: 700` during reasoning and returning truncated JSON with `finishReason: MAX_TOKENS`; fixed by using explicit `responseJsonSchema`, `thinkingLevel: MINIMAL` for Gemini 3.x, `thinkingBudget: 0` for Gemini 2.5 fallback, and a 900-token output budget. With the supplied key, the actual route returned `200` JSON containing a non-empty summary, exactly one recommended next step, and `source: 'gemini'`. Existing malformed-body and missing-key checks returned `400` and `503`; the route uses `Cache-Control: no-store`. `npm run lint`, `npm run typecheck`, `npm run build`, and `git diff --check` pass. The supplied key was used only as a process environment variable and is not tracked.
 
 ---
 
@@ -843,11 +843,11 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
 - [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**
+**Status: COMPLETED**
 
 **Model Tier: Medium**
 
-**Verification Notes:** Not verified.
+**Verification Notes:** Completed: 2026-08-06 — Added `AiSummaryPanel` with Astryx skeleton loading state, a same-origin `POST /api/generate-summary`, 9-second timeout/abort handling, request cleanup and profile-identity stale-response protection, shared `growthSummarySchema` validation, safe text rendering, and a calm non-blocking failure state. Validated Gemini payloads are lifted into `ResultsShell` as `GrowthSummaryResult` for Stage 15. Browser verification in Chromium at desktop and mobile widths confirmed immediate illustrative cards, loading-to-success rendering with a deterministic mocked `200` response, actual provider failure rendering without an uncaught error, exactly one summary request under React Strict Mode, no Google network request, no console errors, and no horizontal overflow in dark and light styling. `npm run lint`, `npm run typecheck`, `npm run build`, and `git diff --check` pass. Stage 13 provider verification was subsequently completed with the live route returning `200`.
 
 ---
 
@@ -887,11 +887,11 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
 - [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
-**Status: NOT STARTED**
+**Status: COMPLETED**
 
 **Model Tier: Medium**
 
-**Verification Notes:** Not verified.
+**Verification Notes:** Completed: 2026-08-06 — Added a personalized prepared summary with exactly one recommended next step, a restrained `NextStepPanel` with a harmless scroll action, and fallback rendering during live loading and after timeout/provider failure. Validated live success atomically replaces the prepared result and shows `Live insight`; forced API failure shows the prepared summary, the required non-alarming fallback status, and preserves both illustrative cards. Chromium checks at 390x844 and 1280x800 confirmed readable layout, no horizontal overflow, keyboard-reachable CTA, dark and light surface contrast, and no console errors. `npm run lint`, `npm run typecheck`, `npm run build`, and `git diff --check` pass. Stage 5 remains BLOCKED for the missing approved logo variant.
 
 ---
 

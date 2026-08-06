@@ -14,10 +14,13 @@ import {
   UserRound,
 } from 'lucide-react';
 import { DotPattern } from '@/components/magicui/dot-pattern';
+import { AiSummaryPanel } from '@/components/results/ai-summary-panel';
 import { ConnectionCard } from '@/components/results/connection-card';
+import { NextStepPanel } from '@/components/results/next-step-panel';
 import { OpportunityCard } from '@/components/results/opportunity-card';
+import { createFallbackSummary } from '@/data/fallback-summary';
 import { labelForField } from '@/data/form-options';
-import type { BusinessNeedsInput } from '@/lib/types';
+import type { BusinessNeedsInput, GrowthSummaryResult } from '@/lib/types';
 
 const REVIEW_ROWS = [
   { field: 'businessName', label: 'Business name', icon: UserRound },
@@ -31,6 +34,9 @@ const REVIEW_ROWS = [
 export function ResultsShell({ values }: { values: BusinessNeedsInput }) {
   const router = useRouter();
   const [showOpportunities, setShowOpportunities] = useState(false);
+  const [growthSummary, setGrowthSummary] = useState<GrowthSummaryResult | null>(null);
+  const fallbackSummary = createFallbackSummary(values);
+  const visibleSummary = growthSummary ?? fallbackSummary;
 
   return (
     <main className="snapshot-page relative min-h-[100dvh] overflow-hidden bg-ink text-warm">
@@ -94,9 +100,13 @@ export function ResultsShell({ values }: { values: BusinessNeedsInput }) {
           </div>
 
           {showOpportunities ? (
-            <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="opportunity-reveal mt-6 grid gap-3 sm:grid-cols-2" aria-live="polite">
-              <OpportunityCard values={values} />
-              <ConnectionCard values={values} />
+            <motion.section id="opportunity-reveal" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="opportunity-reveal mt-6" aria-live="polite">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <OpportunityCard values={values} />
+                <ConnectionCard values={values} />
+              </div>
+              <AiSummaryPanel values={values} fallbackResult={fallbackSummary} onResult={setGrowthSummary} />
+              <NextStepPanel result={visibleSummary} />
             </motion.section>
           ) : null}
         </div>
