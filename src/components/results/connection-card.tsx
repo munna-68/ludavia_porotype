@@ -50,13 +50,13 @@ export function ConnectionCard({ values }: { values: BusinessNeedsInput }) {
         <footer className="result-card__footer">
           <Button
             className="result-card__action"
-            label="Request intro"
+            label="Explore connection"
             variant="secondary"
             size="sm"
             endContent={<ArrowUpRight aria-hidden="true" />}
             onClick={() => setRequested(true)}
           />
-          {requested ? <p className="result-card__status" role="status">Prototype only: no introduction was sent.</p> : null}
+          {requested ? <p className="result-card__status" role="status">Prototype only: nothing was sent or stored.</p> : null}
         </footer>
       </article>
     </Card>

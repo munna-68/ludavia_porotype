@@ -968,11 +968,11 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
 - [ ] No horizontal overflow at 390px or 1280px; both themes retain the established visual language.
 - [ ] `npm run lint`, `npm run typecheck`, and `npm run build` succeed.
 
-**Status: NOT STARTED**
+**Status: COMPLETED**
 
 **Model Tier: High**
 
-**Verification Notes:** Not verified.
+**Verification Notes:** Completed: 2026-08-07 — Replaced the old results reveal with a static four-beat Via21 briefing: observation, leverage, illustrative opportunity/connection, and recommended next move. Continue and Skip reveal the sequence without motion timing; the existing session gate, Gemini route, schema validation, live result replacement, and prepared fallback remain intact. Added the quiet collapsed `Ask Via21 about this` local follow-up, confirmation actions, correction field, and local `Shape this opportunity` state with no persistence or external side effects; kept exactly one illustrative opportunity and one illustrative connection, changing the connection action to avoid implying contact. Verified in Chromium at 390x844 and 1280x800 in dark and light themes: cold-tab `/results` redirects to `/form`, same-tab refresh restores the profile, Edit details returns with values prefilled in the normal submitted-session path, Continue/Skip reveal correctly, live and prepared insight states render, follow-up and confirmation/correction controls are keyboard reachable, and `scrollWidth` equals `clientWidth` with no horizontal overflow. Browser console had no errors; mobile Lighthouse snapshot scored 100 for Accessibility, Best Practices, SEO, and Agentic Browsing. `PATH="/opt/homebrew/opt/node@24/bin:$PATH" npm run lint`, `npm run typecheck`, `npm run build`, `npm run astryx -- doctor` (6 passed, 0 warnings, 0 failures), and `git diff --check` pass. Stage 5 remains independently BLOCKED for the missing approved logo variant.`
 
 ---
 
