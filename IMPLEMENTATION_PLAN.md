@@ -46,6 +46,49 @@ Use this brief to resolve small design choices without inventing new product sco
 - Only the recommended next step is the dominant result action. Other card actions are secondary prototype interactions and must never compete visually or navigate to nonexistent product areas.
 - The page must be usable with keyboard, have visible focus, respect reduced motion, and maintain readable contrast in both themes. Visual polish never overrides basic accessibility.
 
+## Guided Results Experience (Locked 2026-08-07)
+
+This is the authoritative product direction for `/results`. It supersedes earlier instructions that treated results as a static report appended to the form, a dashboard-like card grid, or a chatbot transcript. The onboarding review step remains part of the form journey; after final submission, the user enters a dedicated results briefing.
+
+### Product intent
+
+- Optimize this prototype for investor-demo polish first while preserving a credible small-business owner experience.
+- Make the user feel that LudaVia understands their business and is guiding them toward one clear decision.
+- Make the briefing ritual, not animation alone, the product differentiator: observation -> leverage -> potential match -> next move.
+
+### Guided flow
+
+1. Successful form submission transitions to the dedicated `/results` route as a full-screen product moment. Reuse the established LudaVia header, typography, spacing, controls, colors, and focus behavior; do not append results below the form.
+2. Results may scroll when content requires it, but must be a short, deliberate sequence rather than a long report. The first viewport should establish Via21, the business context, and the first insight without excessive empty space.
+3. Use four beats in this order: `Here's what I see`, `Here's where the leverage is`, `Here's a potential opportunity or connection`, and `Here's the next move I recommend`.
+4. Use a hybrid reveal: the first insight may auto-reveal; later beats use `Continue`; `Skip` makes the full briefing available immediately. Never trap the user in animation.
+5. The AI thinking state is a prominent cinematic moment with an intentional programmed wait targeting approximately three seconds on standard motion settings, capped at three seconds. If Gemini has not returned by then, reveal the prepared fallback and replace it atomically when a valid live response arrives. Reduced-motion users skip the non-essential wait. Never wait indefinitely or hide usable content behind the provider.
+
+### Via21 voice and interaction
+
+- Via21 is an editorial briefing voice, not a ChatGPT clone. Use a calm Via21 note/briefing panel rather than a message transcript, typing indicators, or a conventional assistant chat history.
+- Use the business name sparingly. Personalization should feel attentive, not mechanically repeated.
+- Keep `Ask Via21 about this` quiet and collapsed near the relevant insight. Expanding it reveals a contextual text input; it is never the dominant initial action.
+- After the guided sequence, the follow-up surface can become more visible, but it remains a focused contextual response rather than a general-purpose chat interface.
+- Via21 presents one recommendation and asks for confirmation: `Yes, help me shape it` or `Not quite`. `Not quite` opens a natural-language correction field and a focused revised/detail state, without creating persistent chat history or real-world side effects.
+- The one dominant result action is `Shape this opportunity`. It may open a local prototype state or focused follow-up prompt, but it must not claim to contact a person, send an introduction, or create an account.
+
+### Content and prototype scope
+
+- Keep exactly one illustrative opportunity, one illustrative potential connection, one growth summary, and one recommended next step. Do not expand into a marketplace, search, filters, or multiple-record database for this redesign.
+- Label fictional matches clearly with wording such as `Illustrative potential match` or `Prototype profile`. Do not show fake verification, match percentages, real deadlines, or implied contact.
+- Include `Save the plan` and a PDF download in the prototype. The PDF is a branded one-page executive brief containing the business snapshot, Via21 summary, illustrative opportunity/connection, and recommended next step.
+- Preserve the existing Gemini route, validation, fallback, and server-only key boundary. This redesign must not rebuild working summary generation just to support presentation changes.
+
+### Motion and quality bar
+
+- Motion should create a premium sense of arrival and clarify the four beats. Do not use every Magic UI effect or turn the screen into a component showcase.
+- Prefer a small, coherent set of effects chosen for the content, such as staged list reveals, restrained text reveal, or a single highlighted phrase. No perpetual loops, fake typing, cursor followers, neon effects, or motion that blocks interaction.
+- The experience succeeds when a first-time user feels a genuine wow moment without perceiving generic AI SaaS patterns or AI slop.
+- Preserve keyboard access, visible focus, readable contrast, reduced-motion behavior, and responsive gutters in both themes.
+
+The completed stages below establish the data, API, fallback, and current visual primitives needed for this direction. Their earlier static results arrangement is historical; remaining results work must follow this section.
+
 ---
 
 ## Global rules for every executing agent
@@ -529,7 +572,7 @@ Completed: 2026-08-05 — Stage 2 verified: (1) Installed `@astryxdesign/core@0.
    - Single primary CTA: “Start” / “Explore your growth” → navigates to `/form`
    - Optional secondary text line: “Investor prototype” is **not** required on-screen (avoid breaking immersion); keep README honest instead.
 3. Layout: generous whitespace, vertical center on desktop, comfortable padding on mobile. Black-dominant in dark mode. Keep the primary content visible in a 768px-high laptop viewport without forcing a scroll.
-4. No Motion required yet (Stage 16). CSS-only fade-in is OK.
+4. No Motion required yet (Stage 17). CSS-only fade-in is OK.
 5. CTA uses Astryx primary `Button`.
 6. The splash must not mention Connect & Grow AI, pricing, features, accounts, or production claims. A small `L:V` secondary mark may appear only if it is part of the supplied approved asset; do not type-draw a new logo.
 
@@ -895,31 +938,75 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
 
 ---
 
-## Stage 16 — Motion (framer-motion) animation (load, reveal, transitions)
+## Stage 16 — Guided results experience redesign
 
-**Objective:** Add restrained Motion (framer-motion) animation that gives the demo a premium sense of arrival without delaying interaction or creating hydration/performance problems. Motion is the single motion runtime shared with any Magic UI components added later, so no second animation library is needed.
+**Objective:** Turn the existing results route and completed result primitives into the dedicated Via21 guided briefing defined in the locked product direction. This is new work; do not reopen or rewrite the completed data, session, card, API, summary, or fallback stages unless a defect blocks the redesign.
 
-**Depends on:** Stages 7–15, so motion is applied to stable final surfaces rather than placeholders.
+**Depends on:** Stages 11–15. Stage 5's logo asset gate remains independent.
 
-**Expected files changed:** `package.json`, `package-lock.json`, splash/form/results client motion wrappers, and app CSS.
+**Expected files changed:** `src/components/results/results-shell.tsx`, new or updated Via21 briefing components, result interaction state, result CSS, and only targeted shared types when required. Do not change the Gemini route as part of this stage.
+
+**Instructions:**
+1. Read the `Guided Results Experience (Locked)` section in this plan and the `Guided Results Screen` section in `design.md` before editing. Preserve the existing `/results` route, browser-only session gate, session handoff, API contract, validation, and fallback behavior.
+2. Make `/results` a dedicated post-submit product moment. It must not render as more content below the form and must not become a dashboard or a conventional ChatGPT transcript.
+3. Recompose the existing result content into four guided beats: `Here's what I see`, `Here's where the leverage is`, `Here's a potential opportunity or connection`, and `Here's the next move I recommend`.
+4. Implement the hybrid interaction without relying on motion yet: the first insight may appear automatically; later beats expose `Continue`; `Skip` reveals the complete briefing. Scrolling is allowed but should remain compact and intentional.
+5. Present Via21 as a calm editorial note/briefing voice. Use the business name sparingly. Do not add message history, typing indicators, a generic assistant avatar, or a blank chatbot-first input.
+6. Add a quiet collapsed `Ask Via21 about this` control that expands into contextual text input. Add recommendation confirmation actions: `Yes, help me shape it` and `Not quite`. The correction path must remain a focused local prototype state with no external side effect or persistent chat history.
+7. Make `Shape this opportunity` the only dominant result action. Keep exactly one illustrative opportunity and one illustrative potential connection, with clear prototype labeling and no implied real contact.
+8. Keep the prepared fallback and valid live result behavior intact. The redesign must not remove the always-useful fallback or invent additional AI output contracts.
+9. Match the form journey's existing typography, spacing, surfaces, controls, header language, focus treatment, and responsive gutters in dark and light modes. Use Astryx primitives and existing token-backed styles before adding new CSS.
+
+**Acceptance criteria:**
+- [ ] Submitting the form enters a distinct `/results` briefing rather than appending content to the form.
+- [ ] The route still restores same-tab session data, redirects a cold tab safely, and preserves `Edit details` behavior.
+- [ ] The four beats are understandable in order, with working `Continue` and `Skip` behavior.
+- [ ] `Ask Via21` is secondary, contextual, and not visually or structurally a ChatGPT interface.
+- [ ] Confirmation, correction, and `Shape this opportunity` states are keyboard accessible and have no real-world side effects.
+- [ ] Exactly one illustrative opportunity and one illustrative potential connection remain visible and honestly labeled.
+- [ ] Live success, loading, timeout, and prepared fallback states still work through the existing result contract.
+- [ ] No horizontal overflow at 390px or 1280px; both themes retain the established visual language.
+- [ ] `npm run lint`, `npm run typecheck`, and `npm run build` succeed.
+
+**Status: NOT STARTED**
+
+**Model Tier: High**
+
+**Verification Notes:** Not verified.
+
+---
+
+## Stage 17 — Guided results motion and PDF export
+
+**Objective:** Add restrained Motion (framer-motion) animation and the prototype PDF export to the completed Stage 16 Via21 guided briefing. Motion is the single motion runtime shared with any Magic UI components added later, so no second animation library is needed.
+
+**Depends on:** Stage 16 and Stages 7–15, so motion is applied to the stable guided briefing and completed result surfaces rather than placeholders.
+
+**Expected files changed:** `package.json`, `package-lock.json`, results briefing components, results client motion wrappers, PDF/export code, and app CSS.
 
 **Instructions:**
 1. Install `framer-motion` (or the `motion` package's `motion/react` entry) as a runtime dependency. Only import Motion in `"use client"` components or files with client boundaries.
 2. Define one shared motion vocabulary (a single `variants` set for fade-up reveals, a shared easing curve, and consistent durations) so splash, form, and results all feel like one system.
-3. Splash: logo/title fade-up and CTA reveal with a short, confident sequence. Do not add a preloader by default; only add one if a real asset-loading need is observed, it stays under ~1.2s, and it never hides the CTA on repeat visits.
-4. Form: one subtle section entrance using opacity/transform. Do not animate input values, validation, focus, or layout while the user types.
-5. Results: stagger opportunity card, connection card, featured AI summary, then next-step panel. Prefer viewport-based reveals (`whileInView` with `once: true`) for content that is below the fold; a simple enter stagger is preferable to fragile text splitting.
-6. Respect `prefers-reduced-motion: reduce` through `useReducedMotion()` from framer-motion. Reduced motion must remove non-essential movement while preserving visibility and state changes.
-7. Animate transform and opacity, not width/height/top/left or large blur filters. Keep sequences short enough that the presenter can interact immediately.
-8. Keep motion quiet and editorial: no perpetual loops, bouncing CTAs, cursor-followers, screen wipes, or purple/neon effects. Stop and reset any ongoing animations when the user navigates away.
+3. Keep the current splash and form motion intact unless a defect is found. Do not animate input values, validation, focus, or layout while the user types.
+4. Animate the four existing briefing beats: observation, leverage, illustrative opportunity/connection, and recommended next move. The first beat may auto-reveal; later beats use `Continue`; `Skip` reveals the complete briefing.
+5. Add a prominent but bounded thinking sequence with an intentional programmed wait targeting approximately three seconds on standard motion settings, capped at three seconds. Then show the prepared fallback if the live request is still pending. A later valid Gemini response replaces the fallback without a layout-breaking jump; reduced-motion users skip the non-essential wait.
+6. Add motion only to the existing quiet `Ask Via21` control, confirmation actions (`Yes, help me shape it` / `Not quite`), correction field, and safe local `Shape this opportunity` prototype state. Do not create a ChatGPT-style transcript or real external side effect.
+7. Add `Save the plan` and a branded one-page PDF export containing the snapshot, Via21 summary, illustrative opportunity/connection, and recommended next step. Keep the export client-safe and avoid exposing server-only configuration.
+8. Respect `prefers-reduced-motion: reduce` through `useReducedMotion()` from framer-motion. Reduced motion must remove non-essential movement while preserving visibility and state changes.
+9. Animate transform and opacity, not width/height/top/left or large blur filters. Keep sequences short enough that the presenter can interact immediately.
+10. Keep motion quiet and editorial: no perpetual loops, bouncing CTAs, cursor-followers, screen wipes, fake typing, or purple/neon effects. Do not use every Magic UI effect in one screen.
 
 **Acceptance criteria:**
 - [ ] Splash animation plays on entry and does not block interaction for more than a brief reveal.
-- [ ] Results cards stop configurable on an interaction and do not re-run unexpectedly on every state update.
+- [ ] Results use the four-beat guided briefing, with `Continue` and `Skip` behaving predictably.
+- [ ] The thinking sequence never exceeds approximately three seconds before usable prepared content is revealed.
+- [ ] `Ask Via21`, confirmation, correction, `Shape this opportunity`, save, and PDF actions have clear non-chat behavior.
+- [ ] Results motion stops on interaction and does not re-run unexpectedly on every state update.
 - [ ] `prefers-reduced-motion: reduce` disables non-essential motion.
 - [ ] No hydration warnings from Motion misuse; all browser/Motion work is client-only.
 - [ ] Navigating away and back does not leave stale animations or duplicate effects.
 - [ ] Motion remains smooth at 1280px and usable at 390px.
+- [ ] The PDF contains the intended one-page executive brief content and no secrets.
 - [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
 
@@ -931,20 +1018,20 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
 
 ---
 
-## Stage 17 — Responsive polish & laptop demo pass
+## Stage 18 — Responsive polish & laptop demo pass
 
 **Objective:** Make the final experience presentation-ready on a laptop while preserving a credible mobile-first layout.
 
-**Depends on:** Stages 4–16.
+**Depends on:** Stages 4–17.
 
 **Expected files changed:** shared CSS, route/layout metadata, and only targeted component fixes found during QA.
 
 **Instructions:**
 1. Test the actual running app at widths 390, 768, 1024, 1280, and 1440px. Use both light and dark modes, a fresh tab, a reloaded results tab, and a slow/failing API condition.
 2. Fix overflow, clipped text, uneven gaps, weak tap targets (<44px), header collisions, selector/dialog positioning, form keyboard behavior, and focus visibility.
-3. Desktop: align the two illustrative cards cleanly, keep the result title and profile recap prominent, and make the AI summary read like a featured editorial block rather than a generic chat bubble.
-4. Mobile: keep the same content order, stack cards naturally, preserve readable line lengths, and avoid sticky controls that cover content.
-5. Verify theme toggle, logo variants, card surfaces, borders, focus states, loading skeletons, fallback banners, and motion at every required breakpoint.
+3. Desktop: keep the four-beat briefing legible, keep the result title and profile recap prominent, and make Via21's summary read like a featured editorial block rather than a generic chat bubble.
+4. Mobile: preserve the four-beat order, keep the sequence compact and naturally scrollable, preserve readable line lengths, and avoid sticky controls that cover content.
+5. Verify theme toggle, logo variants, briefing surfaces, borders, focus states, loading skeletons, fallback banners, confirmation/correction states, PDF export, and motion at every required breakpoint.
 6. Check performance: no huge unoptimized images, no duplicated logos, no unnecessary API request loops, and no animation that blocks the main content. Keep all custom CSS token-backed.
 7. Add root metadata: title `LudaVia` and a concise description describing the growth snapshot prototype. Remove all create-next-app default metadata/assets/copy.
 8. Take screenshots or otherwise record a visual check for splash, form, results-success, results-loading, results-fallback, and both themes. This is a visual acceptance gate, not just a build gate.
@@ -968,11 +1055,11 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
 
 ---
 
-## Stage 18 — End-to-end demo script hardening
+## Stage 19 — End-to-end demo script hardening
 
 **Objective:** Make the exact investor pitch path repeatable, fast, and resilient when Gemini or Wi-Fi is imperfect.
 
-**Depends on:** Stages 1–17.
+**Depends on:** Stages 1–18.
 
 **Expected files changed:** `DEMO_SCRIPT.md`, the form component for a presenter-only fill affordance, `README.md`, and bug fixes only.
 
@@ -993,6 +1080,7 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
    ```
    Then exercise the actual production server in a browser. Do not leave `next start` running as a hidden dependency for later agents.
 4. Run the demo at least twice: once with a live key and once with a forced fallback. Reset session state between runs. Fix only defects found in the existing scope; do not add new features.
+5. Verify `Save the plan` downloads the branded one-page executive brief in both live and fallback runs without requiring an account or exposing secrets.
 
 **Acceptance criteria:**
 - [ ] `DEMO_SCRIPT.md` exists and matches the actual UI labels.
@@ -1000,6 +1088,7 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
 - [ ] Production server serves the full flow.
 - [ ] Fallback verified once with key removed/invalid.
 - [ ] Live and fallback runs both leave the investor with a summary and one next step.
+- [ ] Guided briefing controls and PDF export work in the investor demo path.
 - [ ] No real key is committed to source, docs, or shell history copied into the repo.
 - [ ] `npm run lint` and `npm run typecheck` succeed.
 - [ ] `npm run build` succeeds.
@@ -1012,11 +1101,11 @@ UI redesign update: 2026-08-05 — Removed the optional Context step and dead Ba
 
 ---
 
-## Stage 19 — Final QA checklist (release gate)
+## Stage 20 — Final QA checklist (release gate)
 
 **Objective:** Perform the final release gate against the requested prototype scope; only fix defects, do not expand the product.
 
-**Depends on:** Stage 18.
+**Depends on:** Stage 19.
 
 **Expected files changed:** only targeted bug fixes, this plan’s final status block, and the final build-status note.
 
@@ -1132,10 +1221,11 @@ If one of these is missing, implement only the independent stages allowed by thi
 | 13    | Gemini API route              | Medium            |
 | 14    | AI summary client             | Medium            |
 | 15    | Next step + fallback          | Medium            |
-| 16    | GSAP motion                   | High              |
-| 17    | Responsive polish             | High              |
-| 18    | Demo script hardening         | Medium            |
-| 19    | Final QA                      | Medium            |
+| 16    | Guided results redesign       | High              |
+| 17    | Results motion + PDF export   | High              |
+| 18    | Responsive polish             | High              |
+| 19    | Demo script hardening         | Medium            |
+| 20    | Final QA                      | Medium            |
 
 **Note on Astryx:** Confirmed live at https://astryx.atmeta.com — Meta open-source design system (`@astryxdesign/core`), React 19+, theme packages, CLI (`astryx component`, `astryx init`, `astryx doctor`). Executing agents must use the installed version’s docs/CLI rather than inventing component APIs. Current docs also require semantic token usage, the accent-family theme API, and deliberate CSS cascade layers.
 

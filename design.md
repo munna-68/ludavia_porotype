@@ -1,6 +1,6 @@
 # LudaVia Design System
 
-This document is the implementation contract for the LudaVia visual language. Read it before changing or adding UI. The form journey is the primary reference screen; the review/results screen is the same journey continued, not a separate product surface.
+This document is the implementation contract for the LudaVia visual language. Read it before changing or adding UI. The form journey is the primary reference screen; the onboarding review remains part of that journey, while the post-submit results screen is a dedicated guided briefing that reuses the same visual language.
 
 If a reference image conflicts with this document, use the image for composition and this document for typography, spacing, color, interaction, and responsive behavior. Do not invent a third visual direction.
 
@@ -137,9 +137,9 @@ The form and review header are one component pattern. Keep the geometry identica
 - Do not add the LUDAVIA wordmark, theme toggle, menu, or extra navigation to the journey header
 - The wordmark and theme toggle belong to the splash `AppHeader` only unless the product owner explicitly changes the shared shell
 
-## Review Screen
+## Onboarding Review Screen
 
-The review screen is a final step in the form journey. It must feel like the next form step, not a dashboard or a results redesign.
+The onboarding review screen is the final step in the form journey before submission. It must feel like the next form step, not a dashboard. It is distinct from the post-submit results briefing below.
 
 - Use `.snapshot-page` with the same dark canvas and subtle dot/noise texture as the form
 - Use the shared journey header
@@ -154,6 +154,22 @@ The review screen is a final step in the form journey. It must feel like the nex
 - The review CTA has a thin quiet border, dark fill, left-aligned label, and a simple right arrow
 - Do not place a filled purple circle behind the review CTA arrow
 - Keep the CTA width aligned with the review card and the same vertical dimensions as the form action
+
+## Guided Results Screen
+
+The post-submit results route is a dedicated Via21 briefing, not content appended to the form and not a generic dashboard. It should feel like a deliberate product moment while remaining visually continuous with the form journey.
+
+- Reuse the form journey's canvas, header language, typography, gutters, controls, borders, and focus treatment. Do not invent a separate brand system for results.
+- Use a compact sequence of editorial sections rather than a long static report or a dense card grid. Scrolling is allowed when needed, but the first viewport should establish the business context, Via21's first observation, and the next available action.
+- Organize the experience around four beats: observation, leverage, illustrative opportunity/connection, and recommended next move.
+- The first insight may auto-reveal. Later beats use the existing journey action pattern for `Continue`, with a clear `Skip` path to the complete briefing.
+- Use a prominent but bounded thinking state with an intentional programmed wait targeting approximately three seconds on standard motion settings, capped at three seconds. If live generation is slower, prepared content must appear; a valid live response may replace it later without a disruptive layout jump. Reduced-motion users skip the non-essential wait.
+- Present Via21 as a calm editorial note or briefing voice. Do not use a message transcript, typing indicator, assistant avatar, or conventional ChatGPT-style conversation history.
+- Keep `Ask Via21 about this` visually secondary and collapsed until activated. Expanded follow-up should remain contextual and focused.
+- Show exactly one illustrative opportunity and one illustrative potential connection. Label them clearly and never imply that a real person is being contacted.
+- Make `Shape this opportunity` the only dominant result action. Confirmation and correction states must remain local prototype interactions with no external side effects.
+- Include a branded one-page `Save the plan` PDF export containing the business snapshot, Via21 summary, illustrative opportunity/connection, and recommended next step.
+- Use motion to clarify the sequence and create arrival, not as decoration. Respect reduced motion and avoid perpetual loops, fake typing, neon effects, and overloaded Magic UI effects.
 
 ## Controls And Surfaces
 
